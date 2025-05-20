@@ -63,7 +63,7 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          {/* <nav className="hidden md:flex space-x-8">
             <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
               <Link href="/" className="text-gray-700 hover:text-[#663399] transition-colors">
                 Home
@@ -79,7 +79,7 @@ export default function Header() {
                 Categories
               </Link>
             </motion.div>
-          </nav>
+          </nav> */}
 
           {/* Right side - Search, Cart, User */}
           <div className="flex items-center space-x-4">

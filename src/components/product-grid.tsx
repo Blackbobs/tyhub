@@ -7,6 +7,7 @@ import ProductCard from "./product-card"
 const products = [
   {
     id: "1",
+    handle: "wireless-headphones",
     name: "Wireless Headphones",
     price: 199.99,
     image: "/placeholder.svg?height=400&width=400",
@@ -14,6 +15,7 @@ const products = [
   },
   {
     id: "2",
+    handle: "smart-watch",
     name: "Smart Watch",
     price: 249.99,
     image: "/placeholder.svg?height=400&width=400",
@@ -21,6 +23,7 @@ const products = [
   },
   {
     id: "3",
+    handle: "bluetooth-speaker",
     name: "Bluetooth Speaker",
     price: 129.99,
     image: "/placeholder.svg?height=400&width=400",
@@ -28,6 +31,7 @@ const products = [
   },
   {
     id: "4",
+    handle: "fitness-tracker",
     name: "Fitness Tracker",
     price: 99.99,
     image: "/placeholder.svg?height=400&width=400",
@@ -35,6 +39,7 @@ const products = [
   },
   {
     id: "5",
+    handle: "wireless-earbuds",
     name: "Wireless Earbuds",
     price: 149.99,
     image: "/placeholder.svg?height=400&width=400",
@@ -42,6 +47,7 @@ const products = [
   },
   {
     id: "6",
+    handle: "smart-home-hub",
     name: "Smart Home Hub",
     price: 179.99,
     image: "/placeholder.svg?height=400&width=400",
@@ -49,6 +55,7 @@ const products = [
   },
   {
     id: "digital-1",
+    handle: "premium-ui-kit",
     name: "Premium UI Kit",
     price: 49.99,
     image: "/placeholder.svg?height=400&width=400",
@@ -57,6 +64,7 @@ const products = [
   },
   {
     id: "digital-2",
+    handle: "digital-marketing-ebook",
     name: "Digital Marketing eBook",
     price: 19.99,
     image: "/placeholder.svg?height=400&width=400",
@@ -105,7 +113,7 @@ export default function ProductGrid({ searchQuery = "" }: ProductGridProps) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} onAddToCart={() => addToCart(product)} />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       )}

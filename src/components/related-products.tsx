@@ -1,115 +1,91 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import ProductCard from "./product-card"
-import { Loader2 } from "lucide-react"
+import { motion } from "framer-motion"
+import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import { useRouter } from "next/navigation"
+import StaggerContainer from "@/components/animations/stagger-container"
+import StaggerItem from "@/components/animations/stagger-item"
 
-// This would be replaced with a real API call to fetch related products
-const fetchRelatedProducts = async () => {
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 500))
-
-  return [
-    {
-      id: "5",
-      handle: "wireless-earbuds",
-      name: "Wireless Earbuds",
-      price: 149.99,
-      image: "/placeholder.svg?height=400&width=400",
-      category: "Electronics",
-      variants: [
-        {
-          id: "variant-5",
-          title: "Default",
-          price: 149.99,
-          availableForSale: true,
-        },
-      ],
-    },
-    {
-      id: "6",
-      handle: "smart-home-hub",
-      name: "Smart Home Hub",
-      price: 179.99,
-      image: "/placeholder.svg?height=400&width=400",
-      category: "Smart Home",
-      variants: [
-        {
-          id: "variant-6",
-          title: "Default",
-          price: 179.99,
-          availableForSale: true,
-        },
-      ],
-    },
-    {
-      id: "digital-2",
-      handle: "digital-marketing-ebook",
-      name: "Digital Marketing eBook",
-      price: 19.99,
-      image: "/placeholder.svg?height=400&width=400",
-      category: "Digital Products",
-      isDigital: true,
-      variants: [
-        {
-          id: "variant-digital-2",
-          title: "Default",
-          price: 19.99,
-          availableForSale: true,
-        },
-      ],
-    },
-    {
-      id: "8",
-      handle: "portable-charger",
-      name: "Portable Charger",
-      price: 49.99,
-      image: "/placeholder.svg?height=400&width=400",
-      category: "Accessories",
-      variants: [
-        {
-          id: "variant-8",
-          title: "Default",
-          price: 49.99,
-          availableForSale: true,
-        },
-      ],
-    },
-  ]
-}
+// Mock data for related products
+const relatedProducts = [
+  {
+    id: "1",
+    handle: "wireless-headphones",
+    name: "Premium Wireless Headphones",
+    price: 199.99,
+    image: "/placeholder.svg?height=300&width=300",
+  },
+  {
+    id: "2",
+    handle: "bluetooth-speaker",
+    name: "Portable Bluetooth Speaker",
+    price: 89.99,
+    image: "/placeholder.svg?height=300&width=300",
+  },
+  {
+    id: "3",
+    handle: "smart-watch",
+    name: "Smart Fitness Watch",
+    price: 149.99,
+    image: "/placeholder.svg?height=300&width=300",
+  },
+  {
+    id: "4",
+    handle: "digital-ui-kit",
+    name: "Premium UI Kit",
+    price: 49.99,
+    image: "/placeholder.svg?height=300&width=300",
+    isDigital: true,
+  },
+]
 
 export default function RelatedProducts() {
-  const [products, setProducts] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const prefersReducedMotion = useReducedMotion()
+  const router = useRouter()
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const relatedProducts = await fetchRelatedProducts()
-        setProducts(relatedProducts)
-      } catch (error) {
-        console.error("Error loading related products:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadProducts()
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-[#663399]" />
-      </div>
-    )
+  const handleProductClick = (handle: string) => {
+    router.push(`/products/${handle}`)
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+    <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {relatedProducts.map((product) => (
+        <StaggerItem key={product.id}>
+          <motion.div
+            className="group relative overflow-hidden rounded-lg border bg-white p-3 h-full flex flex-col"
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            onClick={() => handleProductClick(product.handle)}
+            layoutId={`product-card-${product.id}`}
+          >
+            <div className="relative aspect-square overflow-hidden rounded-md bg-gray-100 mb-3">
+              <motion.img
+                src={product.image}
+                alt={product.name}
+                className="object-cover w-full h-full transition-transform group-hover:scale-105"
+                layoutId={`product-image-${product.id}`}
+              />
+              {product.isDigital && (
+                <span className="absolute top-2 right-2 bg-[#663399] text-white text-xs px-2 py-1 rounded-full">
+                  Digital
+                </span>
+              )}
+            </div>
+            <div className="flex-1 flex flex-col">
+              <h3 className="font-medium text-sm mb-1">{product.name}</h3>
+              <div className="mt-auto pt-3">
+                <div className="font-bold">${product.price.toFixed(2)}</div>
+                <motion.button
+                  className="w-full mt-2 bg-[#663399] hover:bg-[#563289] text-white py-2 px-3 rounded text-sm transition-colors"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  View Product
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </StaggerItem>
       ))}
-    </div>
+    </StaggerContainer>
   )
 }

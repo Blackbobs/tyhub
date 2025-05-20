@@ -1,6 +1,5 @@
 "use client"
-
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import { useCartStore } from "@/lib/cart-store"
 import { useToast } from "@/hooks/use-toast"
 import { useAuthStore } from "@/lib/auth-store"
@@ -9,6 +8,7 @@ import Head from "next/head"
 import { motion } from "framer-motion"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import FadeIn from "@/components/animations/fade-in"
+import { Download, Heart, Share2, ShoppingCart } from "lucide-react"
 
 // This would be replaced with a real API call to fetch product by handle
 const fetchProductByHandle = async (handle: string) => {
@@ -58,7 +58,8 @@ const fetchProductByHandle = async (handle: string) => {
   }
 }
 
-export default function ProductPage({ params }: { params: { handle: string } }) {
+export default function ProductPage({ params }: { params: Promise<{ handle: string }> }) {
+  const { handle } = use(params)
   const [product, setProduct] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState("")
@@ -72,7 +73,7 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const productData = await fetchProductByHandle(params.handle)
+        const productData = await fetchProductByHandle(handle)
         setProduct(productData)
         setSelectedImage(productData.images[0])
       } catch (error) {
@@ -88,7 +89,7 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
     }
 
     loadProduct()
-  }, [params.handle, toast])
+  }, [handle, toast])
 
   const handleAddToCart = async () => {
     if (!product) return
@@ -222,6 +223,7 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
         />
       </Head>
 
+          
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
           <div className="space-y-4">
@@ -246,20 +248,7 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3 w-3 mr-1"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                      />
-                    </svg>
+                    <Download className="h-3 w-3 mr-1" />
                     Digital Product
                   </motion.span>
                 )}
@@ -420,20 +409,7 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
                       </>
                     ) : (
                       <>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 mr-2"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                          />
-                        </svg>
+                        <Download className="mr-2 h-4 w-4" />
                         Buy Now
                       </>
                     )}
@@ -475,20 +451,7 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
                         </>
                       ) : (
                         <>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5 mr-2"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                            />
-                          </svg>
+                          <ShoppingCart className="mr-2 h-4 w-4" />
                           Add to Cart
                         </>
                       )}
@@ -509,40 +472,14 @@ export default function ProductPage({ params }: { params: { handle: string } }) 
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    />
-                  </svg>
+                  <Heart className="h-4 w-4" />
                 </motion.button>
                 <motion.button
                   className="border border-gray-300 hover:bg-gray-50 text-gray-700 p-3 rounded transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-                    />
-                  </svg>
+                  <Share2 className="h-4 w-4" />
                 </motion.button>
               </div>
             </FadeIn>

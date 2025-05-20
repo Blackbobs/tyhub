@@ -23,20 +23,20 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col">
+    <main className="flex min-h-screen flex-col bg-[#ffffff]">
       <HeroSection />
 
-      <section className="container py-12 md:py-16 lg:py-24" id="featured">
+      <section className="container px-4 py-12 md:py-16 lg:py-24" id="featured">
         <div className="flex flex-col items-center text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl mb-4">Featured Products</h2>
-          <p className="text-muted-foreground max-w-[700px]">
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl mb-4 text-[#171717]">Featured Products</h2>
+          <p className="text-[#171717] max-w-[700px]">
             Discover our handpicked selection of premium products, curated just for you.
           </p>
         </div>
         <FeaturedProducts />
         <div className="flex justify-center mt-10">
           <Link href="/products">
-            <button className="bg-[#663399] hover:bg-[#563289]">
+            <button className="bg-[#663399] hover:bg-[#563289] text-white flex items-center gap-1 font-semibold py-3 px-5 rounded">
               <ShoppingBag className="mr-2 h-4 w-4" />
               View All Products
             </button>

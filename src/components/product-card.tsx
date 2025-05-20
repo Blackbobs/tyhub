@@ -89,36 +89,13 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
       <Link href={`/products/${product.handle}`}>
         <div className="aspect-square relative overflow-hidden">
           <motion.img
-            src={product.image || "/placeholder.svg?height=400&width=400"}
+            src={product.image || "/placeholder.svg?height=300&width=300"}
             alt={product.name}
             className="object-cover w-full h-full"
             animate={{ scale: isHovered ? 1.05 : 1 }}
             transition={{ duration: 0.3 }}
           />
-          {product.isDigital && (
-            <motion.span
-              className="absolute top-2 right-2 bg-[#663399] text-white text-xs px-2 py-1 rounded-full flex items-center"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-3 w-3 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              Digital
-            </motion.span>
-          )}
+          
         </div>
       </Link>
       <div className="p-4">
@@ -132,7 +109,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
         </motion.div>
         <Link href={`/products/${product.handle}`} className="hover:underline">
           <motion.h3
-            className="font-medium text-lg mb-2 line-clamp-1"
+            className="font-medium text-lg mb-2 line-clamp-1 text-[#171717]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -141,7 +118,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           </motion.h3>
         </Link>
         <motion.div
-          className="font-bold mb-4"
+          className="font-bold mb-4 text-[#171717]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -151,7 +128,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
         <motion.button
           onClick={handleAddToCart}
           disabled={isLoading || !defaultVariant.availableForSale}
-          className="w-full bg-[#663399] hover:bg-[#563289] text-white py-2 px-4 rounded transition-colors disabled:opacity-50 flex items-center justify-center"
+          className="w-full bg-[#663399] hover:bg-[#563289] text-white font-semibold py-2 px-4 rounded transition-colors disabled:opacity-50 flex items-center justify-center"
           variants={buttonVariants}
           initial="hidden"
           animate="visible"
@@ -178,26 +155,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               </motion.svg>
               Adding...
             </>
-          ) : product.isDigital ? (
-            <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              Buy Now
-            </>
-          ) : (
-            <>
+          ) :  <>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4 mr-2"
@@ -209,8 +167,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
               Add to Cart
-            </>
-          )}
+            </>}
         </motion.button>
       </div>
     </motion.div>
