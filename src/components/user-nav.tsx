@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useAuthStore } from "@/lib/auth-store"
-import { Button } from "@/components/ui/button"
+import { useAuthStore } from "@/store/auth-store";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,14 +9,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { User } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/dropdown-menu";
+import { User } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function UserNav() {
-  const { user, isAuthenticated, logout } = useAuthStore()
-  const router = useRouter()
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const router = useRouter();
 
   if (!isAuthenticated) {
     return (
@@ -32,7 +32,7 @@ export default function UserNav() {
           </Button>
         </Link>
       </div>
-    )
+    );
   }
 
   return (
@@ -46,7 +46,9 @@ export default function UserNav() {
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user?.name}</p>
-            <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {user?.email}
+            </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -62,13 +64,13 @@ export default function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
-            logout()
-            router.push("/")
+            logout();
+            router.push("/");
           }}
         >
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

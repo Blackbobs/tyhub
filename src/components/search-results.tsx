@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useSearchStore } from "@/lib/search-store"
-import { useDebounce } from "@/hooks/use-debounce"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import { useEffect, useState } from "react";
+import { useSearchStore } from "@/store/search-store";
+import { useDebounce } from "@/hooks/use-debounce";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 // Mock product data - in a real app, this would come from your API or Shopify
 const allProducts = [
@@ -68,44 +68,48 @@ const allProducts = [
     category: "Digital Products",
     isDigital: true,
   },
-]
+];
 
 export default function SearchResults() {
-  const { searchQuery, isSearching, setIsSearching } = useSearchStore()
-  const debouncedSearchQuery = useDebounce(searchQuery, 300)
-  const [results, setResults] = useState<typeof allProducts>([])
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
-  const prefersReducedMotion = useReducedMotion()
+  const { searchQuery, isSearching, setIsSearching } = useSearchStore();
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const [results, setResults] = useState<typeof allProducts>([]);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (debouncedSearchQuery.length < 2) {
-      setResults([])
-      return
+      setResults([]);
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     // Simulate API call with setTimeout
     const timer = setTimeout(() => {
       const filteredProducts = allProducts.filter(
         (product) =>
-          product.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-          product.category.toLowerCase().includes(debouncedSearchQuery.toLowerCase()),
-      )
-      setResults(filteredProducts)
-      setLoading(false)
-    }, 300)
+          product.name
+            .toLowerCase()
+            .includes(debouncedSearchQuery.toLowerCase()) ||
+          product.category
+            .toLowerCase()
+            .includes(debouncedSearchQuery.toLowerCase())
+      );
+      setResults(filteredProducts);
+      setLoading(false);
+    }, 300);
 
-    return () => clearTimeout(timer)
-  }, [debouncedSearchQuery])
+    return () => clearTimeout(timer);
+  }, [debouncedSearchQuery]);
 
-  if (!isSearching || debouncedSearchQuery.length < 2) return null
+  if (!isSearching || debouncedSearchQuery.length < 2) return null;
 
   const handleResultClick = (productId: string) => {
-    setIsSearching(false)
-    router.push(`/products/${productId}`)
-  }
+    setIsSearching(false);
+    router.push(`/products/${productId}`);
+  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: -10 },
@@ -118,13 +122,13 @@ export default function SearchResults() {
       },
     },
     exit: { opacity: 0, y: -10 },
-  }
+  };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: { opacity: 1, y: 0 },
     exit: { opacity: 0, y: 10 },
-  }
+  };
 
   return (
     <AnimatePresence>
@@ -144,9 +148,20 @@ export default function SearchResults() {
                 fill="none"
                 viewBox="0 0 24 24"
                 animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                transition={{
+                  duration: 1,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: "linear",
+                }}
               >
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
                 <path
                   className="opacity-75"
                   fill="currentColor"
@@ -155,7 +170,9 @@ export default function SearchResults() {
               </motion.svg>
             </div>
           ) : results.length === 0 ? (
-            <div className="py-4 text-center text-gray-500">No products found for "{debouncedSearchQuery}"</div>
+            <div className="py-4 text-center text-gray-500">
+              No products found for "{debouncedSearchQuery}"
+            </div>
           ) : (
             <div className="space-y-2">
               {results.map((product) => (
@@ -182,7 +199,9 @@ export default function SearchResults() {
               ))}
               <div className="pt-2 pb-1 text-center border-t">
                 <Link
-                  href={`/products?search=${encodeURIComponent(debouncedSearchQuery)}`}
+                  href={`/products?search=${encodeURIComponent(
+                    debouncedSearchQuery
+                  )}`}
                   className="text-sm text-[#663399] hover:underline"
                   onClick={() => setIsSearching(false)}
                 >
@@ -194,5 +213,5 @@ export default function SearchResults() {
         </div>
       </motion.div>
     </AnimatePresence>
-  )
+  );
 }

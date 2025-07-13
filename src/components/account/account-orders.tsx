@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useAuthStore } from "@/lib/auth-store"
-import { motion } from "framer-motion"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import Link from "next/link";
+import { useAuthStore } from "@/store/auth-store";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 // Mock order data - in a real app, this would come from an API
 const mockOrders = [
@@ -34,13 +34,13 @@ const mockOrders = [
       { id: "5", name: "Wireless Earbuds", quantity: 1, price: 99.99 },
     ],
   },
-]
+];
 
 export default function AccountOrders() {
-  const { user } = useAuthStore()
-  const prefersReducedMotion = useReducedMotion()
+  const { user } = useAuthStore();
+  const prefersReducedMotion = useReducedMotion();
 
-  if (!user) return null
+  if (!user) return null;
 
   return (
     <div className="space-y-6">
@@ -50,8 +50,12 @@ export default function AccountOrders() {
 
       {mockOrders.length === 0 ? (
         <div className="text-center py-12">
-          <h3 className="text-lg font-medium mb-2">You haven&apos;t placed any orders yet</h3>
-          <p className="text-gray-500 mb-4">Once you place an order, it will appear here.</p>
+          <h3 className="text-lg font-medium mb-2">
+            You haven&apos;t placed any orders yet
+          </h3>
+          <p className="text-gray-500 mb-4">
+            Once you place an order, it will appear here.
+          </p>
           <Link href="/products">
             <motion.button
               className="bg-[#663399] hover:bg-[#563289] text-white px-4 py-2 rounded"
@@ -92,15 +96,17 @@ export default function AccountOrders() {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div>
                     <h3 className="text-lg font-medium">Order #{order.id}</h3>
-                    <p className="text-sm text-gray-500">Placed on {order.date}</p>
+                    <p className="text-sm text-gray-500">
+                      Placed on {order.date}
+                    </p>
                   </div>
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       order.status === "Delivered"
                         ? "bg-green-100 text-green-800"
                         : order.status === "Processing"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-yellow-100 text-yellow-800"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-yellow-100 text-yellow-800"
                     }`}
                   >
                     {order.status}
@@ -110,14 +116,21 @@ export default function AccountOrders() {
               <div className="p-4">
                 <div className="space-y-3">
                   {order.items.map((item) => (
-                    <div key={item.id} className="flex justify-between items-center">
+                    <div
+                      key={item.id}
+                      className="flex justify-between items-center"
+                    >
                       <div className="flex items-center gap-2">
                         <div className="h-10 w-10 rounded-md bg-gray-100 flex items-center justify-center">
-                          <span className="text-xs text-gray-500">{item.id}</span>
+                          <span className="text-xs text-gray-500">
+                            {item.id}
+                          </span>
                         </div>
                         <div>
                           <p className="font-medium">{item.name}</p>
-                          <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                          <p className="text-sm text-gray-500">
+                            Qty: {item.quantity}
+                          </p>
                         </div>
                       </div>
                       <p className="font-medium">${item.price.toFixed(2)}</p>
@@ -152,5 +165,5 @@ export default function AccountOrders() {
         </motion.div>
       )}
     </div>
-  )
+  );
 }

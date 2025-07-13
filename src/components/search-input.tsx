@@ -1,66 +1,69 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useSearchStore } from "@/lib/search-store"
-import { useEffect, useRef } from "react"
-import SearchResults from "./search-results"
-import { motion } from "framer-motion"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import type React from "react";
+import { useSearchStore } from "@/store/search-store";
+import { useEffect, useRef } from "react";
+import SearchResults from "./search-results";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 export default function SearchInput() {
-  const { searchQuery, setSearchQuery, isSearching, setIsSearching } = useSearchStore()
-  const inputRef = useRef<HTMLInputElement>(null)
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const prefersReducedMotion = useReducedMotion()
+  const { searchQuery, setSearchQuery, isSearching, setIsSearching } =
+    useSearchStore();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
+    setSearchQuery(e.target.value);
     if (!isSearching && e.target.value.length > 0) {
-      setIsSearching(true)
+      setIsSearching(true);
     }
-  }
+  };
 
   const clearSearch = () => {
-    setSearchQuery("")
-    setIsSearching(false)
+    setSearchQuery("");
+    setIsSearching(false);
     if (inputRef.current) {
-      inputRef.current.focus()
+      inputRef.current.focus();
     }
-  }
+  };
 
   // Close search results when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsSearching(false)
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
+        setIsSearching(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [setIsSearching])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setIsSearching]);
 
-  // Close search results on escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsSearching(false)
+        setIsSearching(false);
       }
-    }
+    };
 
-    document.addEventListener("keydown", handleEscape)
+    document.addEventListener("keydown", handleEscape);
     return () => {
-      document.removeEventListener("keydown", handleEscape)
-    }
-  }, [setIsSearching])
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [setIsSearching]);
 
   return (
     <div className="relative w-full max-w-sm" ref={wrapperRef}>
       <div className="relative">
         <svg
-          className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400"
+          className="absolute left-2.5 top-3 h-4 w-4 text-gray-400"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -100,7 +103,12 @@ export default function SearchInput() {
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
             <span className="sr-only">Clear search</span>
           </motion.button>
@@ -108,5 +116,5 @@ export default function SearchInput() {
       </div>
       <SearchResults />
     </div>
-  )
+  );
 }

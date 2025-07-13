@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useToast } from "@/hooks/use-toast"
-import { useAuthStore } from "@/lib/auth-store"
-import { motion } from "framer-motion"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useAuthStore } from "@/store/auth-store";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 export default function AccountDetails() {
-  const { user, updateUser } = useAuthStore()
-  const [isLoading, setIsLoading] = useState(false)
-  const [isPasswordLoading, setIsPasswordLoading] = useState(false)
-  const { toast } = useToast()
-  const prefersReducedMotion = useReducedMotion()
+  const { user, updateUser } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+  const { toast } = useToast();
+  const prefersReducedMotion = useReducedMotion();
 
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -24,66 +24,66 @@ export default function AccountDetails() {
     state: "",
     zipCode: "",
     country: "",
-  })
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
       // In a real app, this would make an API call to update user details
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       updateUser({
         ...user!,
         name: formData.name,
         email: formData.email,
-      })
+      });
 
       toast({
         title: "Account updated",
         description: "Your account details have been updated successfully.",
-      })
+      });
     } catch (error) {
       toast({
         title: "Update failed",
         description: "There was a problem updating your account details.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsPasswordLoading(true)
+    e.preventDefault();
+    setIsPasswordLoading(true);
 
     try {
       // In a real app, this would make an API call to update password
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       toast({
         title: "Password updated",
         description: "Your password has been updated successfully.",
-      })
+      });
     } catch (error) {
       toast({
         title: "Update failed",
         description: "There was a problem updating your password.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsPasswordLoading(false)
+      setIsPasswordLoading(false);
     }
-  }
+  };
 
-  if (!user) return null
+  if (!user) return null;
 
   return (
     <div className="space-y-6">
@@ -95,7 +95,9 @@ export default function AccountDetails() {
       >
         <div className="p-4 border-b">
           <h3 className="text-lg font-medium">Account Details</h3>
-          <p className="text-sm text-gray-500">Update your account information</p>
+          <p className="text-sm text-gray-500">
+            Update your account information
+          </p>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="p-4 space-y-4">
@@ -146,7 +148,10 @@ export default function AccountDetails() {
               <h3 className="font-medium mb-2">Shipping Address</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 md:col-span-2">
-                  <label htmlFor="address" className="block text-sm font-medium">
+                  <label
+                    htmlFor="address"
+                    className="block text-sm font-medium"
+                  >
                     Address
                   </label>
                   <input
@@ -182,7 +187,10 @@ export default function AccountDetails() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="zipCode" className="block text-sm font-medium">
+                  <label
+                    htmlFor="zipCode"
+                    className="block text-sm font-medium"
+                  >
                     ZIP/Postal Code
                   </label>
                   <input
@@ -194,7 +202,10 @@ export default function AccountDetails() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="country" className="block text-sm font-medium">
+                  <label
+                    htmlFor="country"
+                    className="block text-sm font-medium"
+                  >
                     Country
                   </label>
                   <input
@@ -224,7 +235,11 @@ export default function AccountDetails() {
                     fill="none"
                     viewBox="0 0 24 24"
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                    transition={{
+                      duration: 1,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "linear",
+                    }}
                   >
                     <circle
                       className="opacity-25"
@@ -263,7 +278,10 @@ export default function AccountDetails() {
         <form onSubmit={handlePasswordSubmit}>
           <div className="p-4 space-y-4">
             <div className="space-y-2">
-              <label htmlFor="currentPassword" className="block text-sm font-medium">
+              <label
+                htmlFor="currentPassword"
+                className="block text-sm font-medium"
+              >
                 Current Password
               </label>
               <input
@@ -273,7 +291,10 @@ export default function AccountDetails() {
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="newPassword" className="block text-sm font-medium">
+              <label
+                htmlFor="newPassword"
+                className="block text-sm font-medium"
+              >
                 New Password
               </label>
               <input
@@ -283,7 +304,10 @@ export default function AccountDetails() {
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium"
+              >
                 Confirm New Password
               </label>
               <input
@@ -309,7 +333,11 @@ export default function AccountDetails() {
                     fill="none"
                     viewBox="0 0 24 24"
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                    transition={{
+                      duration: 1,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "linear",
+                    }}
                   >
                     <circle
                       className="opacity-25"
@@ -335,5 +363,5 @@ export default function AccountDetails() {
         </form>
       </motion.div>
     </div>
-  )
+  );
 }

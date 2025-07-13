@@ -1,66 +1,99 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { useCartStore } from "@/lib/cart-store"
-import { useOnClickOutside } from "@/hooks/use-click-outside"
-import { motion, AnimatePresence } from "framer-motion"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import { useEffect, useRef, useState } from "react";
+import { useCart } from "@/hooks/useCart";
+import { useOnClickOutside } from "@/hooks/use-click-outside";
+import { motion, AnimatePresence } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { Loader2, ShoppingCart, X, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 export default function CartModal() {
-  const [isOpen, setIsOpen] = useState(false)
-  const { items, totalItems, subtotal, isLoading, error, fetchCart, updateQuantity, removeFromCart, clearCart } =
-    useCartStore()
-  const modalRef = useRef<HTMLDivElement>(null)
-  const prefersReducedMotion = useReducedMotion()
+  const [isOpen, setIsOpen] = useState(false);
+  const {
+    cart,
+    isLoading,
+    error,
+    updateCartItem,
+    removeFromCart,
+    clearCart,
+    isMutating,
+  } = useCart();
+  const modalRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   // Close modal when clicking outside
-  useOnClickOutside(modalRef, () => setIsOpen(false))
-
-  // Fetch cart on initial load
-  useEffect(() => {
-    fetchCart()
-  }, [fetchCart])
+  useOnClickOutside(modalRef, () => setIsOpen(false));
 
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden"
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "auto"
+      document.body.style.overflow = "auto";
     }
     return () => {
-      document.body.style.overflow = "auto"
-    }
-  }, [isOpen])
-
-  const handleCheckout = async () => {
-    window.location.href = "/api/shopify/checkout"
-  }
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
 
   // Animation variants
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
-  }
+  };
 
   const cartVariants = {
     hidden: { x: "100%" },
     visible: { x: 0 },
-  }
+  };
 
   const cartItemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
-  }
+  };
 
   const buttonVariants = {
     hover: { scale: 1.05 },
     tap: { scale: 0.95 },
-  }
+  };
+
+  const subtotal = Array.isArray(cart?.items)
+  ? cart.items.reduce((total, item) => total + item.product.price * item.quantity, 0)
+  : 0;
+
+const totalItems = Array.isArray(cart?.items)
+  ? cart.items.reduce((total, item) => total + item.quantity, 0)
+  : 0;
+
+
+  const handleUpdateQuantity = async (productId: string, quantity: number) => {
+    try {
+      await updateCartItem({productId, quantity});
+    } catch (error) {
+      // Error handling is done in the mutation
+    }
+  };
+
+  const handleRemoveItem = async (productId: string) => {
+    try {
+      await removeFromCart(productId);
+    } catch (error) {
+      // Error handling is done in the mutation
+    }
+  };
+
+  const handleClearCart = async () => {
+    try {
+      await clearCart();
+    } catch (error) {
+      // Error handling is done in the mutation
+    }
+  };
 
   return (
     <div>
-      {/* Cart Button with Badge Animation */}
+      {/* Cart Button with Badge */}
       <motion.button
         onClick={() => setIsOpen(true)}
         className="relative p-2 text-gray-700 hover:text-gray-900 transition-colors"
@@ -68,16 +101,7 @@ export default function CartModal() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
+        <ShoppingCart className="h-6 w-6" />
         <AnimatePresence>
           {totalItems > 0 && (
             <motion.span
@@ -93,18 +117,19 @@ export default function CartModal() {
         </AnimatePresence>
       </motion.button>
 
-      {/* Cart Modal with Animation */}
+      {/* Cart Modal */}
       <AnimatePresence>
         {isOpen && (
           <>
             <motion.div
-              className="fixed inset-0 z-50 bg-black bg-opacity-50"
+              className="fixed inset-0 z-50 bg-black/50 bg-opacity-50"
               initial="hidden"
               animate="visible"
               exit="hidden"
               variants={backdropVariants}
               transition={{ duration: 0.2 }}
             />
+            
             <motion.div
               ref={modalRef}
               className="fixed right-0 top-0 z-50 h-full w-full max-w-md bg-white shadow-lg flex flex-col"
@@ -112,11 +137,17 @@ export default function CartModal() {
               animate="visible"
               exit="hidden"
               variants={cartVariants}
-              transition={prefersReducedMotion ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 30 }}
+              transition={
+                prefersReducedMotion
+                  ? { duration: 0 }
+                  : { type: "spring", stiffness: 300, damping: 30 }
+              }
             >
               {/* Header */}
               <div className="p-4 border-b flex justify-between items-center">
-                <h2 className="text-lg font-semibold">Your Cart ({totalItems})</h2>
+                <h2 className="text-lg font-semibold">
+                  Your Cart ({totalItems})
+                </h2>
                 <motion.button
                   onClick={() => setIsOpen(false)}
                   className="text-gray-500 hover:text-gray-700"
@@ -124,16 +155,7 @@ export default function CartModal() {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className="h-6 w-6" />
                 </motion.button>
               </div>
 
@@ -141,30 +163,9 @@ export default function CartModal() {
               <div className="flex-1 overflow-auto p-4">
                 {isLoading ? (
                   <div className="flex items-center justify-center h-full">
-                    <motion.svg
-                      className="h-8 w-8 text-[#663399]"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </motion.svg>
+                    <Loader2 className="h-8 w-8 text-[#663399] animate-spin" />
                   </div>
-                ) : items.length === 0 ? (
+                ) : Array.isArray(cart?.items) && cart.items.length === 0 ?  (
                   <motion.div
                     className="flex flex-col items-center justify-center h-full text-center"
                     initial={{ opacity: 0 }}
@@ -175,25 +176,21 @@ export default function CartModal() {
                       className="bg-gray-100 rounded-full p-6 mb-4"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.3 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20,
+                        delay: 0.3,
+                      }}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-10 w-10 text-gray-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                        />
-                      </svg>
+                      <ShoppingCart className="h-10 w-10 text-gray-500" />
                     </motion.div>
-                    <h3 className="font-medium text-lg mb-2">Your cart is empty</h3>
-                    <p className="text-gray-500 mb-6">Looks like you haven't added anything to your cart yet.</p>
+                    <h3 className="font-medium text-lg mb-2">
+                      Your cart is empty
+                    </h3>
+                    <p className="text-gray-500 mb-6">
+                      Looks like you haven't added anything to your cart yet.
+                    </p>
                     <motion.button
                       onClick={() => setIsOpen(false)}
                       className="bg-[#663399] hover:bg-[#563289] text-white py-2 px-4 rounded transition-colors"
@@ -217,18 +214,25 @@ export default function CartModal() {
                       },
                     }}
                   >
-                    {items.map((item) => (
+                    {cart?.items.map((item) => (
                       <motion.div
-                        key={item.id}
+                        key={item.product._id}
                         className="flex gap-4 border-b pb-4"
                         variants={cartItemVariants}
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                        }}
                         layout
                       >
                         <div className="h-20 w-20 rounded-md overflow-hidden bg-white flex-shrink-0">
                           <motion.img
-                            src={item.image?.url || "/placeholder.svg?height=80&width=80"}
-                            alt={item.image?.altText || item.title}
+                            src={
+                              item.product.images?.[0]?.url ||
+                              "/placeholder.svg"
+                            }
+                            alt={item.product.title}
                             className="h-full w-full object-cover"
                             whileHover={{ scale: 1.1 }}
                             transition={{ duration: 0.3 }}
@@ -236,57 +240,69 @@ export default function CartModal() {
                         </div>
                         <div className="flex-1 flex flex-col">
                           <div className="flex justify-between">
-                            <h4 className="font-medium">{item.productTitle}</h4>
+                            <Link 
+                              href={`/products/${item.product._id}`}
+                              className="font-medium hover:underline"
+                            >
+                              {item.product.title}
+                            </Link>
                             <motion.button
-                              onClick={() => removeFromCart(item.id)}
+                              onClick={() => handleRemoveItem(item.product._id)}
                               className="text-gray-500 hover:text-red-500"
                               aria-label="Remove item"
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                             >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
+                              <Trash2 className="h-5 w-5" />
                             </motion.button>
                           </div>
-                          <div className="text-sm text-gray-500">{item.title}</div>
                           <div className="mt-auto flex justify-between items-center">
                             <div className="flex items-center border rounded-md">
                               <motion.button
-                                onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                                disabled={item.quantity <= 1 || isLoading}
+                                onClick={() =>
+                                  handleUpdateQuantity(
+                                    item.product._id,
+                                    Math.max(1, item.quantity - 1)
+                                  )
+                                }
+                                disabled={item.quantity <= 1 || isMutating}
                                 className="px-2 py-1 border-r disabled:opacity-50"
                                 aria-label="Decrease quantity"
-                                whileHover={item.quantity > 1 && !isLoading ? { backgroundColor: "#f3f4f6" } : {}}
-                                whileTap={item.quantity > 1 && !isLoading ? { scale: 0.95 } : {}}
+                                whileHover={
+                                  item.quantity > 1 && !isMutating
+                                    ? { backgroundColor: "#f3f4f6" }
+                                    : {}
+                                }
+                                whileTap={
+                                  item.quantity > 1 && !isMutating
+                                    ? { scale: 0.95 }
+                                    : {}
+                                }
                               >
                                 -
                               </motion.button>
-                              <span className="w-8 text-center">{item.quantity}</span>
+                              <span className="w-8 text-center">
+                                {item.quantity}
+                              </span>
                               <motion.button
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                disabled={isLoading}
+                                onClick={() =>
+                                  handleUpdateQuantity(item.product._id, item.quantity + 1)
+                                }
+                                disabled={isMutating}
                                 className="px-2 py-1 border-l disabled:opacity-50"
                                 aria-label="Increase quantity"
-                                whileHover={!isLoading ? { backgroundColor: "#f3f4f6" } : {}}
-                                whileTap={!isLoading ? { scale: 0.95 } : {}}
+                                whileHover={
+                                  !isMutating
+                                    ? { backgroundColor: "#f3f4f6" }
+                                    : {}
+                                }
+                                whileTap={!isMutating ? { scale: 0.95 } : {}}
                               >
                                 +
                               </motion.button>
                             </div>
                             <div className="font-medium">
-                              ${(Number.parseFloat(item.price.amount) * item.quantity).toFixed(2)}
+                              ${(item.product.price * item.quantity).toFixed(2)}
                             </div>
                           </div>
                         </div>
@@ -297,7 +313,7 @@ export default function CartModal() {
               </div>
 
               {/* Footer */}
-              {items.length > 0 && (
+              {cart?.items && cart.items.length > 0 && (
                 <motion.div
                   className="border-t p-4"
                   initial={{ opacity: 0, y: 20 }}
@@ -337,46 +353,26 @@ export default function CartModal() {
 
                   <div className="space-y-2">
                     <motion.button
-                      onClick={handleCheckout}
-                      disabled={isLoading}
+                      disabled={isMutating}
                       className="w-full bg-[#663399] hover:bg-[#563289] text-white py-2 px-4 rounded transition-colors disabled:opacity-50 flex items-center justify-center"
                       variants={buttonVariants}
                       whileHover="hover"
                       whileTap="tap"
                     >
-                      {isLoading ? (
-                        <>
-                          <motion.svg
-                            className="mr-2 h-4 w-4 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </motion.svg>
-                          Processing...
-                        </>
-                      ) : (
-                        "Checkout"
-                      )}
+                      <Link href="/checkout">
+                        {isMutating ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          "Checkout"
+                        )}
+                      </Link>
                     </motion.button>
                     <motion.button
-                      onClick={() => clearCart()}
-                      disabled={isLoading}
+                      onClick={handleClearCart}
+                      disabled={isMutating}
                       className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 px-4 rounded transition-colors disabled:opacity-50"
                       variants={buttonVariants}
                       whileHover="hover"
@@ -392,5 +388,5 @@ export default function CartModal() {
         )}
       </AnimatePresence>
     </div>
-  )
+  );
 }

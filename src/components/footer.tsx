@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <Link href="/" className="inline-block mb-4">
-              <span className="text-xl font-bold text-[#663399]">ShopDrop</span>
+              <span className="text-xl font-bold text-[#663399]">HubDigital</span>
             </Link>
             <p className="text-gray-500 mb-4 max-w-xs">
               Your one-stop shop for premium products delivered directly to your doorstep.
@@ -75,22 +75,22 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/categories" className="text-gray-500 hover:text-[#663399]">
+                <Link href="/#!" className="text-gray-500 hover:text-[#663399]">
                   Categories
                 </Link>
               </li>
               <li>
-                <Link href="/new-arrivals" className="text-gray-500 hover:text-[#663399]">
+                <Link href="/#!" className="text-gray-500 hover:text-[#663399]">
                   New Arrivals
                 </Link>
               </li>
               <li>
-                <Link href="/best-sellers" className="text-gray-500 hover:text-[#663399]">
+                <Link href="/#!" className="text-gray-500 hover:text-[#663399]">
                   Best Sellers
                 </Link>
               </li>
               <li>
-                <Link href="/sale" className="text-gray-500 hover:text-[#663399]">
+                <Link href="/#!" className="text-gray-500 hover:text-[#663399]">
                   Sale
                 </Link>
               </li>
@@ -132,32 +132,32 @@ export default function Footer() {
             <h3 className="font-medium text-lg mb-4">Customer Service</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/help" className="text-gray-500 hover:text-[#663399]">
+                <Link href="/#!" className="text-gray-500 hover:text-[#663399]">
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="text-gray-500 hover:text-[#663399]">
+                <Link href="/#!" className="text-gray-500 hover:text-[#663399]">
                   Shipping & Delivery
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="text-gray-500 hover:text-[#663399]">
+                <Link href="/#!" className="text-gray-500 hover:text-[#663399]">
                   Returns & Exchanges
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-gray-500 hover:text-[#663399]">
+                <Link href="/#!" className="text-gray-500 hover:text-[#663399]">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-gray-500 hover:text-[#663399]">
+                <Link href="/#!" className="text-gray-500 hover:text-[#663399]">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-gray-500 hover:text-[#663399]">
+                <Link href="/#!" className="text-gray-500 hover:text-[#663399]">
                   Terms & Conditions
                 </Link>
               </li>
@@ -166,7 +166,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-500 text-sm">&copy; {new Date().getFullYear()} ShopDrop. All rights reserved.</p>
+          <p className="text-gray-500 text-sm">&copy; {new Date().getFullYear()} HubDigital. All rights reserved.</p>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
             <img src="/placeholder.svg?height=30&width=50" alt="Visa" className="h-8" />
             <img src="/placeholder.svg?height=30&width=50" alt="Mastercard" className="h-8" />

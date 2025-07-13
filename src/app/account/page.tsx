@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useAuthStore } from "@/lib/auth-store"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function AccountPage() {
-  const { user, isAuthenticated } = useAuthStore()
-  const router = useRouter()
+  const { user, isAuthenticated } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push("/auth/login")
+      router.push("/auth/login");
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, router]);
 
   if (!isAuthenticated || !user) {
-    return null
+    return null;
   }
 
   return (
@@ -27,8 +27,8 @@ export default function AccountPage() {
         </div>
         <button
           onClick={() => {
-            useAuthStore.getState().logout()
-            router.push("/")
+            useAuthStore.getState().logout();
+            router.push("/");
           }}
         >
           Sign Out
@@ -55,5 +55,5 @@ export default function AccountPage() {
         </TabsContent>
       </Tabs> */}
     </div>
-  )
+  );
 }

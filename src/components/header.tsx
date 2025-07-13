@@ -1,26 +1,29 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useAuthStore } from "@/lib/auth-store"
-import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
-import SearchInput from "./search-input"
-import CartSheet from "./cart-sheet"
+import { useState } from "react";
+import Link from "next/link";
+import { useAuthStore } from "@/store/auth-store";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import SearchInput from "./search-input";
+import CartModal from "./cart-modal";
+
 
 export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const { user, isAuthenticated, logout } = useAuthStore()
-  const router = useRouter()
-  const prefersReducedMotion = useReducedMotion()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { user, logout } = useAuthStore();
+  const router = useRouter();
+  const prefersReducedMotion = useReducedMotion();
+  const isAuthenticated = !!user;
+
 
   const handleLogout = () => {
-    logout()
-    setUserMenuOpen(false)
-    router.push("/")
-  }
+    logout();
+    setUserMenuOpen(false);
+    router.push("/");
+  };
 
   const menuVariants = {
     hidden: { opacity: 0, y: -5, height: 0 },
@@ -41,23 +44,22 @@ export default function Header() {
         duration: 0.2,
       },
     },
-  }
+  };
 
   const itemVariants = {
     hidden: { opacity: 0, x: -10 },
     visible: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: -10 },
-  }
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-40">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          {/* Logo */}
           <div className="flex-shrink-0">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link href="/" className="text-xl font-bold text-[#663399]">
-                ShopDrop
+                HubDigital
               </Link>
             </motion.div>
           </div>
@@ -81,17 +83,13 @@ export default function Header() {
             </motion.div>
           </nav> */}
 
-          {/* Right side - Search, Cart, User */}
           <div className="flex items-center space-x-4">
-            {/* Search */}
             <div className="hidden md:block relative">
               <SearchInput />
             </div>
 
-            {/* Cart */}
-            <CartSheet />
+            <CartModal />
 
-            {/* User Menu */}
             <div className="relative">
               <motion.button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -127,10 +125,12 @@ export default function Header() {
                     {isAuthenticated ? (
                       <>
                         <div className="px-4 py-2 border-b">
-                          <p className="text-sm font-medium">{user?.name}</p>
+                          <p className="text-sm font-medium">{user?.username || user?.email}</p>
                           <p className="text-xs text-gray-500">{user?.email}</p>
                         </div>
-                        <motion.div variants={prefersReducedMotion ? {} : itemVariants}>
+                        <motion.div
+                          variants={prefersReducedMotion ? {} : itemVariants}
+                        >
                           <Link
                             href="/account"
                             onClick={() => setUserMenuOpen(false)}
@@ -139,7 +139,9 @@ export default function Header() {
                             Account
                           </Link>
                         </motion.div>
-                        <motion.div variants={prefersReducedMotion ? {} : itemVariants}>
+                        <motion.div
+                          variants={prefersReducedMotion ? {} : itemVariants}
+                        >
                           <Link
                             href="/account?tab=orders"
                             onClick={() => setUserMenuOpen(false)}
@@ -148,7 +150,9 @@ export default function Header() {
                             Orders
                           </Link>
                         </motion.div>
-                        <motion.div variants={prefersReducedMotion ? {} : itemVariants}>
+                        <motion.div
+                          variants={prefersReducedMotion ? {} : itemVariants}
+                        >
                           <Link
                             href="/account?tab=downloads"
                             onClick={() => setUserMenuOpen(false)}
@@ -167,7 +171,9 @@ export default function Header() {
                       </>
                     ) : (
                       <>
-                        <motion.div variants={prefersReducedMotion ? {} : itemVariants}>
+                        <motion.div
+                          variants={prefersReducedMotion ? {} : itemVariants}
+                        >
                           <Link
                             href="/auth/login"
                             onClick={() => setUserMenuOpen(false)}
@@ -176,7 +182,9 @@ export default function Header() {
                             Login
                           </Link>
                         </motion.div>
-                        <motion.div variants={prefersReducedMotion ? {} : itemVariants}>
+                        <motion.div
+                          variants={prefersReducedMotion ? {} : itemVariants}
+                        >
                           <Link
                             href="/auth/signup"
                             onClick={() => setUserMenuOpen(false)}
@@ -208,9 +216,17 @@ export default function Header() {
                 strokeWidth={2}
               >
                 {mobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </motion.button>
@@ -248,7 +264,7 @@ export default function Header() {
                     }
               }
             >
-              <div className="px-2 pt-2 pb-4 space-y-1">
+              {/* <div className="px-2 pt-2 pb-4 space-y-1">
                 <motion.div variants={prefersReducedMotion ? {} : itemVariants} whileHover={{ x: 5 }}>
                   <Link
                     href="/"
@@ -276,12 +292,15 @@ export default function Header() {
                     Categories
                   </Link>
                 </motion.div>
-              </div>
+              </div> */}
               <div className="pt-4 pb-3 border-t border-gray-200">
                 <div className="px-2 space-y-1">
                   {isAuthenticated ? (
                     <>
-                      <motion.div variants={prefersReducedMotion ? {} : itemVariants} whileHover={{ x: 5 }}>
+                      <motion.div
+                        variants={prefersReducedMotion ? {} : itemVariants}
+                        whileHover={{ x: 5 }}
+                      >
                         <Link
                           href="/account"
                           onClick={() => setMobileMenuOpen(false)}
@@ -290,7 +309,10 @@ export default function Header() {
                           Account
                         </Link>
                       </motion.div>
-                      <motion.div variants={prefersReducedMotion ? {} : itemVariants} whileHover={{ x: 5 }}>
+                      <motion.div
+                        variants={prefersReducedMotion ? {} : itemVariants}
+                        whileHover={{ x: 5 }}
+                      >
                         <Link
                           href="/account?tab=orders"
                           onClick={() => setMobileMenuOpen(false)}
@@ -299,7 +321,10 @@ export default function Header() {
                           Orders
                         </Link>
                       </motion.div>
-                      <motion.div variants={prefersReducedMotion ? {} : itemVariants} whileHover={{ x: 5 }}>
+                      <motion.div
+                        variants={prefersReducedMotion ? {} : itemVariants}
+                        whileHover={{ x: 5 }}
+                      >
                         <Link
                           href="/account?tab=downloads"
                           onClick={() => setMobileMenuOpen(false)}
@@ -310,8 +335,8 @@ export default function Header() {
                       </motion.div>
                       <motion.button
                         onClick={() => {
-                          handleLogout()
-                          setMobileMenuOpen(false)
+                          handleLogout();
+                          setMobileMenuOpen(false);
                         }}
                         className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#663399] hover:bg-gray-50"
                         variants={prefersReducedMotion ? {} : itemVariants}
@@ -322,7 +347,10 @@ export default function Header() {
                     </>
                   ) : (
                     <>
-                      <motion.div variants={prefersReducedMotion ? {} : itemVariants} whileHover={{ x: 5 }}>
+                      <motion.div
+                        variants={prefersReducedMotion ? {} : itemVariants}
+                        whileHover={{ x: 5 }}
+                      >
                         <Link
                           href="/auth/login"
                           onClick={() => setMobileMenuOpen(false)}
@@ -331,7 +359,10 @@ export default function Header() {
                           Login
                         </Link>
                       </motion.div>
-                      <motion.div variants={prefersReducedMotion ? {} : itemVariants} whileHover={{ x: 5 }}>
+                      <motion.div
+                        variants={prefersReducedMotion ? {} : itemVariants}
+                        whileHover={{ x: 5 }}
+                      >
                         <Link
                           href="/auth/signup"
                           onClick={() => setMobileMenuOpen(false)}
@@ -354,5 +385,5 @@ export default function Header() {
         </AnimatePresence>
       </div>
     </header>
-  )
+  );
 }

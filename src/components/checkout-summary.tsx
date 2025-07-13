@@ -1,22 +1,25 @@
-"use client"
+"use client";
 
-import { useCartStore } from "@/lib/cart-store"
-import { motion } from "framer-motion"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import { useCartStore } from "@/store/cart-store";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 export default function CheckoutSummary() {
-  const { cart } = useCartStore()
-  const prefersReducedMotion = useReducedMotion()
+  const { cart } = useCartStore();
+  const prefersReducedMotion = useReducedMotion();
 
-  const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0)
-  const shipping = 5.99
-  const tax = subtotal * 0.1 // 10% tax
-  const total = subtotal + shipping + tax
+  const subtotal = cart.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+  const shipping = 5.99;
+  const tax = subtotal * 0.1; // 10% tax
+  const total = subtotal + shipping + tax;
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
-  }
+  };
 
   return (
     <motion.div
@@ -40,9 +43,14 @@ export default function CheckoutSummary() {
         }}
       >
         {cart.map((item) => (
-          <motion.div key={item.id} className="flex justify-between text-sm" variants={itemVariants}>
+          <motion.div
+            key={item.id}
+            className="flex justify-between text-sm"
+            variants={itemVariants}
+          >
             <span>
-              {item.name} <span className="text-gray-500">x{item.quantity}</span>
+              {item.name}{" "}
+              <span className="text-gray-500">x{item.quantity}</span>
             </span>
             <span>${(item.price * item.quantity).toFixed(2)}</span>
           </motion.div>
@@ -73,5 +81,5 @@ export default function CheckoutSummary() {
         <span>${total.toFixed(2)}</span>
       </div>
     </motion.div>
-  )
+  );
 }

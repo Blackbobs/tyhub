@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useAuthStore } from "@/lib/auth-store"
-import { motion } from "framer-motion"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import Link from "next/link";
+import { useAuthStore } from "@/store/auth-store";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 // Mock digital product data - in a real app, this would come from an API
 const mockDownloads = [
@@ -37,13 +37,13 @@ const mockDownloads = [
     fileType: "ZIP",
     downloadUrl: "#",
   },
-]
+];
 
 export default function AccountDownloads() {
-  const { user } = useAuthStore()
-  const prefersReducedMotion = useReducedMotion()
+  const { user } = useAuthStore();
+  const prefersReducedMotion = useReducedMotion();
 
-  if (!user) return null
+  if (!user) return null;
 
   return (
     <div className="space-y-6">
@@ -53,8 +53,12 @@ export default function AccountDownloads() {
 
       {mockDownloads.length === 0 ? (
         <div className="text-center py-12">
-          <h3 className="text-lg font-medium mb-2">You haven&apos;t purchased any digital products yet</h3>
-          <p className="text-gray-500 mb-4">Once you purchase a digital product, it will appear here.</p>
+          <h3 className="text-lg font-medium mb-2">
+            You haven&apos;t purchased any digital products yet
+          </h3>
+          <p className="text-gray-500 mb-4">
+            Once you purchase a digital product, it will appear here.
+          </p>
           <Link href="/products">
             <motion.button
               className="bg-[#663399] hover:bg-[#563289] text-white px-4 py-2 rounded"
@@ -112,7 +116,9 @@ export default function AccountDownloads() {
                     </div>
                     <div>
                       <h3 className="text-lg font-medium">{download.name}</h3>
-                      <p className="text-sm text-gray-500">{download.description}</p>
+                      <p className="text-sm text-gray-500">
+                        {download.description}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -163,5 +169,5 @@ export default function AccountDownloads() {
         </motion.div>
       )}
     </div>
-  )
+  );
 }
