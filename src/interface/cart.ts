@@ -1,7 +1,15 @@
 import { Product } from "@/services/product.service";
 
 export interface ICartItem {
-    product: Product;
+  product: {
+    _id: string;
+    title: string;
+    price: number;
+    images: {
+      url: string;
+      publicId: string;
+    }[];
+  };
     quantity: number;
   }
 

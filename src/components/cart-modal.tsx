@@ -10,6 +10,9 @@ import Link from "next/link";
 
 export default function CartModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const [quantityInputs, setQuantityInputs] = useState<Record<string, number>>(
+    {}
+  );
   const {
     cart,
     isLoading,
@@ -18,9 +21,22 @@ export default function CartModal() {
     removeFromCart,
     clearCart,
     isMutating,
+    checkout,
+    isCheckingOut,
   } = useCart();
   const modalRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+
+  // Initialize quantity inputs when cart loads
+  useEffect(() => {
+    if (cart?.items) {
+      const initialQuantities = cart.items.reduce((acc, item) => {
+        acc[item.product._id] = item.quantity;
+        return acc;
+      }, {} as Record<string, number>);
+      setQuantityInputs(initialQuantities);
+    }
+  }, [cart?.items]);
 
   // Close modal when clicking outside
   useOnClickOutside(modalRef, () => setIsOpen(false));
@@ -58,18 +74,25 @@ export default function CartModal() {
     tap: { scale: 0.95 },
   };
 
-  const subtotal = Array.isArray(cart?.items)
-  ? cart.items.reduce((total, item) => total + item.product.price * item.quantity, 0)
-  : 0;
+  const subtotal =
+    cart?.items?.reduce((total, item) => {
+      const quantity = quantityInputs[item.product._id] || item.quantity;
+      return total + item.product.price * quantity;
+    }, 0) || 0;
 
-const totalItems = Array.isArray(cart?.items)
-  ? cart.items.reduce((total, item) => total + item.quantity, 0)
-  : 0;
+  const totalItems =
+    cart?.items?.reduce((total, item) => total + item.quantity, 0) || 0;
 
+  const handleQuantityChange = (productId: string, newQuantity: number) => {
+    setQuantityInputs((prev) => ({
+      ...prev,
+      [productId]: Math.max(1, newQuantity),
+    }));
+  };
 
   const handleUpdateQuantity = async (productId: string, quantity: number) => {
     try {
-      await updateCartItem({productId, quantity});
+      await updateCartItem({ productId, quantity });
     } catch (error) {
       // Error handling is done in the mutation
     }
@@ -86,6 +109,14 @@ const totalItems = Array.isArray(cart?.items)
   const handleClearCart = async () => {
     try {
       await clearCart();
+    } catch (error) {
+      // Error handling is done in the mutation
+    }
+  };
+
+  const handleCheckout = async () => {
+    try {
+      await checkout();
     } catch (error) {
       // Error handling is done in the mutation
     }
@@ -129,7 +160,7 @@ const totalItems = Array.isArray(cart?.items)
               variants={backdropVariants}
               transition={{ duration: 0.2 }}
             />
-            
+
             <motion.div
               ref={modalRef}
               className="fixed right-0 top-0 z-50 h-full w-full max-w-md bg-white shadow-lg flex flex-col"
@@ -165,7 +196,7 @@ const totalItems = Array.isArray(cart?.items)
                   <div className="flex items-center justify-center h-full">
                     <Loader2 className="h-8 w-8 text-[#663399] animate-spin" />
                   </div>
-                ) : Array.isArray(cart?.items) && cart.items.length === 0 ?  (
+                ) : Array.isArray(cart?.items) && cart.items.length === 0 ? (
                   <motion.div
                     className="flex flex-col items-center justify-center h-full text-center"
                     initial={{ opacity: 0 }}
@@ -214,100 +245,152 @@ const totalItems = Array.isArray(cart?.items)
                       },
                     }}
                   >
-                    {cart?.items.map((item) => (
-                      <motion.div
-                        key={item.product._id}
-                        className="flex gap-4 border-b pb-4"
-                        variants={cartItemVariants}
-                        transition={{
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 30,
-                        }}
-                        layout
-                      >
-                        <div className="h-20 w-20 rounded-md overflow-hidden bg-white flex-shrink-0">
-                          <motion.img
-                            src={
-                              item.product.images?.[0]?.url ||
-                              "/placeholder.svg"
-                            }
-                            alt={item.product.title}
-                            className="h-full w-full object-cover"
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ duration: 0.3 }}
-                          />
-                        </div>
-                        <div className="flex-1 flex flex-col">
-                          <div className="flex justify-between">
-                            <Link 
-                              href={`/products/${item.product._id}`}
-                              className="font-medium hover:underline"
-                            >
-                              {item.product.title}
-                            </Link>
-                            <motion.button
-                              onClick={() => handleRemoveItem(item.product._id)}
-                              className="text-gray-500 hover:text-red-500"
-                              aria-label="Remove item"
+                    {Array.isArray(cart?.items) &&
+                      cart?.items.map((item) => (
+                        <motion.div
+                          key={item.product._id}
+                          className="flex gap-4 border-b pb-4"
+                          variants={cartItemVariants}
+                          transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 30,
+                          }}
+                          layout
+                        >
+                          <div className="h-20 w-20 rounded-md overflow-hidden bg-white flex-shrink-0">
+                            <motion.img
+                              src={
+                                item.product.images?.[0]?.url ||
+                                "/placeholder.svg"
+                              }
+                              alt={item.product.title}
+                              className="h-full w-full object-cover"
                               whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                            >
-                              <Trash2 className="h-5 w-5" />
-                            </motion.button>
+                              transition={{ duration: 0.3 }}
+                            />
                           </div>
-                          <div className="mt-auto flex justify-between items-center">
-                            <div className="flex items-center border rounded-md">
+                          <div className="flex-1 flex flex-col">
+                            <div className="flex justify-between">
+                              <Link
+                                href={`/products/${item.product._id}`}
+                                className="font-medium hover:underline"
+                              >
+                                {item.product.title}
+                              </Link>
                               <motion.button
                                 onClick={() =>
-                                  handleUpdateQuantity(
-                                    item.product._id,
-                                    Math.max(1, item.quantity - 1)
-                                  )
+                                  handleRemoveItem(item.product._id)
                                 }
-                                disabled={item.quantity <= 1 || isMutating}
-                                className="px-2 py-1 border-r disabled:opacity-50"
-                                aria-label="Decrease quantity"
-                                whileHover={
-                                  item.quantity > 1 && !isMutating
-                                    ? { backgroundColor: "#f3f4f6" }
-                                    : {}
-                                }
-                                whileTap={
-                                  item.quantity > 1 && !isMutating
-                                    ? { scale: 0.95 }
-                                    : {}
-                                }
+                                className="text-gray-500 hover:text-red-500"
+                                aria-label="Remove item"
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
                               >
-                                -
-                              </motion.button>
-                              <span className="w-8 text-center">
-                                {item.quantity}
-                              </span>
-                              <motion.button
-                                onClick={() =>
-                                  handleUpdateQuantity(item.product._id, item.quantity + 1)
-                                }
-                                disabled={isMutating}
-                                className="px-2 py-1 border-l disabled:opacity-50"
-                                aria-label="Increase quantity"
-                                whileHover={
-                                  !isMutating
-                                    ? { backgroundColor: "#f3f4f6" }
-                                    : {}
-                                }
-                                whileTap={!isMutating ? { scale: 0.95 } : {}}
-                              >
-                                +
+                                <Trash2 className="h-5 w-5" />
                               </motion.button>
                             </div>
-                            <div className="font-medium">
-                              ${(item.product.price * item.quantity).toFixed(2)}
+                            <div className="mt-auto flex justify-between items-center">
+                              <div className="flex items-center border rounded-md">
+                                <motion.button
+                                  onClick={() => {
+                                    const newQuantity = Math.max(
+                                      1,
+                                      quantityInputs[item.product._id] - 1
+                                    );
+                                    handleQuantityChange(
+                                      item.product._id,
+                                      newQuantity
+                                    );
+                                    handleUpdateQuantity(
+                                      item.product._id,
+                                      newQuantity
+                                    );
+                                  }}
+                                  disabled={
+                                    quantityInputs[item.product._id] <= 1 ||
+                                    isMutating
+                                  }
+                                  className="px-2 py-1 border-r disabled:opacity-50"
+                                  aria-label="Decrease quantity"
+                                  whileHover={
+                                    quantityInputs[item.product._id] > 1 &&
+                                    !isMutating
+                                      ? { backgroundColor: "#f3f4f6" }
+                                      : {}
+                                  }
+                                  whileTap={
+                                    quantityInputs[item.product._id] > 1 &&
+                                    !isMutating
+                                      ? { scale: 0.95 }
+                                      : {}
+                                  }
+                                >
+                                  -
+                                </motion.button>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={
+                                    quantityInputs[item.product._id] ||
+                                    item.quantity
+                                  }
+                                  onChange={(e) => {
+                                    const newQuantity =
+                                      parseInt(e.target.value) || 1;
+                                    handleQuantityChange(
+                                      item.product._id,
+                                      newQuantity
+                                    );
+                                  }}
+                                  onBlur={() =>
+                                    handleUpdateQuantity(
+                                      item.product._id,
+                                      quantityInputs[item.product._id]
+                                    )
+                                  }
+                                  className="w-12 text-center border-t border-b border-gray-300 py-1 px-2"
+                                  disabled={isMutating}
+                                />
+                                <motion.button
+                                  onClick={() => {
+                                    const newQuantity =
+                                      (quantityInputs[item.product._id] ||
+                                        item.quantity) + 1;
+                                    handleQuantityChange(
+                                      item.product._id,
+                                      newQuantity
+                                    );
+                                    handleUpdateQuantity(
+                                      item.product._id,
+                                      newQuantity
+                                    );
+                                  }}
+                                  disabled={isMutating}
+                                  className="px-2 py-1 border-l disabled:opacity-50"
+                                  aria-label="Increase quantity"
+                                  whileHover={
+                                    !isMutating
+                                      ? { backgroundColor: "#f3f4f6" }
+                                      : {}
+                                  }
+                                  whileTap={!isMutating ? { scale: 0.95 } : {}}
+                                >
+                                  +
+                                </motion.button>
+                              </div>
+                              <div className="font-medium">
+                                $
+                                {(
+                                  item.product.price *
+                                  (quantityInputs[item.product._id] ||
+                                    item.quantity)
+                                ).toFixed(2)}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    ))}
+                        </motion.div>
+                      ))}
                   </motion.div>
                 )}
               </div>
@@ -352,24 +435,25 @@ const totalItems = Array.isArray(cart?.items)
                   </div>
 
                   <div className="space-y-2">
+                    {/* <Link href="/checkout" passHref> */}
                     <motion.button
-                      disabled={isMutating}
+                      disabled={isMutating || isCheckingOut}
+                      onClick={handleCheckout}
                       className="w-full bg-[#663399] hover:bg-[#563289] text-white py-2 px-4 rounded transition-colors disabled:opacity-50 flex items-center justify-center"
                       variants={buttonVariants}
                       whileHover="hover"
                       whileTap="tap"
                     >
-                      <Link href="/checkout">
-                        {isMutating ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processing...
-                          </>
-                        ) : (
-                          "Checkout"
-                        )}
-                      </Link>
+                      {isCheckingOut ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        "Checkout"
+                      )}
                     </motion.button>
+                    {/* </Link> */}
                     <motion.button
                       onClick={handleClearCart}
                       disabled={isMutating}

@@ -37,3 +37,8 @@ export const clearCart = async (): Promise<ICart> => {
   const response = await axiosConfig.delete("/cart/clear");
   return response.data;
 };
+
+export const createCheckoutSession = async (): Promise<string> => {
+  const response = await axiosConfig.post<{ url: string }>('/checkout/create-session');
+  return response.data.url;
+};
