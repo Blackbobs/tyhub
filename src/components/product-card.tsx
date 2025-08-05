@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
@@ -17,15 +16,13 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addToCart, isMutating } = useCart();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
   const handleAddToCart = async () => {
     try {
       await addToCart({ productId: product._id, quantity: 1 });
-    } catch (error) {
+    } catch {
       // Error handling is done in the mutation
     }
   };

@@ -1,4 +1,3 @@
-// hooks/useProducts.ts
 import { useQuery } from '@tanstack/react-query'
 import { getProductById, getProducts, productKeys } from '@/services/product.service'
 
@@ -6,7 +5,7 @@ export const useProducts = (searchQuery?: string) => {
   return useQuery({
     queryKey: productKeys.list(searchQuery || ''),
     queryFn: () => getProducts(searchQuery),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -14,15 +13,14 @@ export const useProduct = (id: string) => {
   return useQuery({
     queryKey: productKeys.detail(id),
     queryFn: () => getProductById(id),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   })
 }
 
 export const useRelatedProducts = (productId: string) => {
   return useQuery({
     queryKey: [...productKeys.all, 'related', productId],
-    queryFn: () => {
-      // In a real app, you might have a dedicated endpoint for related products
+    queryFn: async () => {
       return getProducts().then(products => 
         products
           .filter(p => p._id !== productId)

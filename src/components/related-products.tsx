@@ -2,7 +2,6 @@
 'use client'
 
 import { motion } from "framer-motion"
-import Link from "next/link"
 import { Product } from "@/services/product.service"
 import ProductCard from "./product-card"
 

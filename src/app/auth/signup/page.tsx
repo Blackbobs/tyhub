@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/auth-store";
 import { useMutation } from "@tanstack/react-query";
 import axiosConfig from "@/utils/axios-config";
+import { AxiosError } from "axios";
 
 type FormData = {
   username: string;
@@ -32,8 +33,8 @@ export default function SignupPage() {
   } = useForm<FormData>();
 
   const signupMutation = useMutation({
-    mutationFn: async (userData: Omit<FormData, 'confirmPassword'>) => {
-      const response = await axiosConfig.post('/users/signup', userData);
+    mutationFn: async (userData: Omit<FormData, "confirmPassword">) => {
+      const response = await axiosConfig.post("/users/signup", userData);
       return response.data;
     },
   });
@@ -48,7 +49,8 @@ export default function SignupPage() {
     }
 
     try {
-      const { confirmPassword, ...userData } = data;
+      const { password, email, username, address } = data;
+      const userData = { password, email, username, address };
       const res = await signupMutation.mutateAsync(userData);
 
       localStorage.setItem("accessToken", res.token);
@@ -60,13 +62,15 @@ export default function SignupPage() {
       });
 
       router.push("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+
       let errorMessage = "An error occurred while creating your account.";
 
-      if (error?.response?.status === 409) {
+      if (axiosError?.response?.status === 409) {
         errorMessage = "Email already in use. Please use a different email.";
-      } else if (error?.response?.data?.message) {
-        errorMessage = error.response.data.message;
+      } else if (axiosError?.response?.data?.message) {
+        errorMessage = axiosError.response.data.message;
       }
 
       toast({
@@ -77,10 +81,12 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="container max-w-md mx-auto py-12">
+    <div className="container max-w-md mx-auto py-12 px-5">
       <div className="space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-[#663399]">Create an account</h1>
+          <h1 className="text-3xl font-bold text-[#663399]">
+            Create an account
+          </h1>
           <p className="text-muted-foreground text-gray-500">
             Enter your information to create an account
           </p>
@@ -96,7 +102,11 @@ export default function SignupPage() {
               className="border-2 rounded-md p-2 border-[#663399] bg-transparent focus:outline-none"
               placeholder="John Doe"
             />
-            {errors.username && <span className="text-sm text-red-500">Full name is required</span>}
+            {errors.username && (
+              <span className="text-sm text-red-500">
+                Full name is required
+              </span>
+            )}
           </div>
 
           {/* Email */}
@@ -145,7 +155,9 @@ export default function SignupPage() {
               </button>
             </div>
             {errors.password && (
-              <span className="text-sm text-red-500">{errors.password.message}</span>
+              <span className="text-sm text-red-500">
+                {errors.password.message}
+              </span>
             )}
           </div>
 
@@ -159,9 +171,12 @@ export default function SignupPage() {
               className="border-2 rounded-md p-2 border-[#663399] bg-transparent focus:outline-none"
               placeholder="••••••••"
             />
-            {watch("password") && watch("password") !== watch("confirmPassword") && (
-              <span className="text-sm text-red-500">Passwords do not match</span>
-            )}
+            {watch("password") &&
+              watch("password") !== watch("confirmPassword") && (
+                <span className="text-sm text-red-500">
+                  Passwords do not match
+                </span>
+              )}
           </div>
 
           {/* Address (optional) */}

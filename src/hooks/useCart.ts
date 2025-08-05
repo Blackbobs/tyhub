@@ -1,4 +1,3 @@
-// hooks/useCart.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getCart,
@@ -9,6 +8,7 @@ import {
   createCheckoutSession
 } from '@/services/cart.service';
 import { useToast } from './use-toast';
+import { ICart } from '@/interface/cart';
 
 export const useCart = () => {
   const queryClient = useQueryClient();
@@ -66,10 +66,14 @@ export const useCart = () => {
       await queryClient.cancelQueries({ queryKey: ['cart'] });
       
       // Optimistically update
-      queryClient.setQueryData(['cart'], (old: any) => ({
-        ...old,
-        items: old?.items?.filter((item: any) => item.product._id !== productId) || []
-      }));
+      queryClient.setQueryData<ICart | undefined>(['cart'], (old) => {
+        if(!old) return undefined
+
+        return{
+          ...old,
+          items: old.items.filter(item => item.product._id !== productId)
+        }
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });

@@ -1,6 +1,4 @@
-// components/auth-guard.tsx
 "use client";
-
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
@@ -8,15 +6,15 @@ import { Loader2 } from "lucide-react";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, _hasHydrated } = useAuthStore();
 
   useEffect(() => {
-    if (!user) {
+    if (_hasHydrated && !user) {
       router.push("/auth/login");
     }
-  }, [user, router]);
+  }, [user, _hasHydrated, router]);
 
-  if (!user) {
+  if (!_hasHydrated) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="animate-spin h-12 w-12 text-[#663399]" />

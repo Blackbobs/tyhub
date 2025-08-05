@@ -1,35 +1,32 @@
-// app/products/[id]/page.tsx
-'use client'
+"use client";
+import { useRouter } from "next/navigation";
+import Head from "next/head";
+import FadeIn from "@/components/animations/fade-in";
+import { Download, Heart, Share2, ShoppingCart } from "lucide-react";
+import RelatedProducts from "@/components/related-products";
+import { Loader2 } from "lucide-react";
+import { use, useEffect, useState } from "react";
+import { useProduct, useRelatedProducts } from "@/hooks/use-product";
+import { useCart } from "@/hooks/useCart";
+import Image from "next/image";
 
-import { useToast } from "@/hooks/use-toast"
-import { useAuthStore } from "@/store/auth-store"
-import { useRouter } from "next/navigation"
-import Head from "next/head"
-import { motion } from "framer-motion"
-import FadeIn from "@/components/animations/fade-in"
-import { Download, Heart, Share2, ShoppingCart } from "lucide-react"
-import RelatedProducts from "@/components/related-products"
-import { Loader2 } from "lucide-react"
-import { use, useEffect, useState } from "react"
-import { useProduct, useRelatedProducts } from "@/hooks/use-product"
-import { useCart } from '@/hooks/useCart';
-
-export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params) 
-  const { data: product, isLoading, error } = useProduct(id)
-  const { data: relatedProducts } = useRelatedProducts(id)
-  const [selectedImage, setSelectedImage] = useState("")
-  const [addingToCart, setAddingToCart] = useState(false)
-  const { toast } = useToast()
-  const { user } = useAuthStore()
-  const router = useRouter()
+export default function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const { data: product, isLoading, error } = useProduct(id);
+  const { data: relatedProducts } = useRelatedProducts(id);
+  const [selectedImage, setSelectedImage] = useState("");
+  const router = useRouter();
   const { addToCart, isMutating } = useCart();
 
   useEffect(() => {
     if (product?.images?.[0]?.url) {
-      setSelectedImage(product.images[0].url)
+      setSelectedImage(product.images[0].url);
     }
-  }, [product])
+  }, [product]);
 
   const handleAddToCart = async () => {
     if (!product) return;
@@ -37,41 +34,41 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     try {
       await addToCart({ productId: product._id, quantity: 1 });
     } catch (error) {
-     console.log(error)
+      console.log(error);
     }
   };
-  const handleBuyNow = async () => {
-    if (!product) return
+  // const handleBuyNow = async () => {
+  //   if (!product) return
 
-    if (product.type === 'digital' && !user) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to purchase digital products.",
-      })
-      router.push("/auth/login")
-      return
-    }
+  //   if (product.type === 'digital' && !user) {
+  //     toast({
+  //       title: "Authentication required",
+  //       description: "Please log in to purchase digital products.",
+  //     })
+  //     router.push("/auth/login")
+  //     return
+  //   }
 
-    setAddingToCart(true)
-    try {
-      await addToCart({ productId: product._id, quantity: 1 });
+  //   // setAddingToCart(true)
+  //   try {
+  //     await addToCart({ productId: product._id, quantity: 1 });
 
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to proceed to checkout",
-      })
-    } finally {
-      setAddingToCart(false)
-    }
-  }
+  //   } catch (error) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to proceed to checkout",
+  //     })
+  //   } finally {
+  //     // setAddingToCart(false)
+  //   }
+  // }
 
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-12 flex items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-[#663399]" />
       </div>
-    )
+    );
   }
 
   if (error || !product) {
@@ -79,7 +76,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-2xl font-bold">Product not found</h1>
         <p className="mt-4">
-          The product you're looking for doesn't exist or has been removed.
+          The product you&apos;re looking for doesn&apos;t exist or has been
+          removed.
         </p>
         <button
           className="mt-6 bg-[#663399] hover:bg-[#563289] text-white py-2 px-4 rounded transition-colors"
@@ -88,7 +86,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           Back to Products
         </button>
       </div>
-    )
+    );
   }
 
   return (
@@ -104,12 +102,18 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           <div className="space-y-4">
             <FadeIn>
               <div className="relative aspect-square overflow-hidden rounded-lg border bg-white">
-                <img
-                  src={selectedImage || product.images[0]?.url || "/placeholder.svg"}
+                <Image
+                  src={
+                    selectedImage ||
+                    product.images[0]?.url
+                  }
                   alt={product.title}
+                  width={500}
+                  height={500}
                   className="object-cover w-full h-full"
+                  priority
                 />
-                {product.type === 'digital' && (
+                {product.type === "digital" && (
                   <span className="absolute top-4 right-4 bg-[#663399] text-white text-xs px-2 py-1 rounded-full flex items-center">
                     <Download className="h-3 w-3 mr-1" />
                     Digital Product
@@ -127,9 +131,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     }`}
                     onClick={() => setSelectedImage(image.url)}
                   >
-                    <img
+                    <Image
                       src={image.url || "/placeholder.svg"}
                       alt={`${product.title} - Image ${i + 1}`}
+                      width={100}
+                      height={100}
                       className="object-cover w-full h-full"
                     />
                   </button>
@@ -140,76 +146,79 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
           {/* Product Info */}
           <div className="space-y-6">
-          <FadeIn>
-  <div>
-    <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
-    <p className="mt-2 text-lg text-gray-700">{product.description}</p>
-  </div>
-</FadeIn>
+            <FadeIn>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {product.title}
+                </h1>
+                <p className="mt-2 text-lg text-gray-700">
+                  {product.description}
+                </p>
+              </div>
+            </FadeIn>
 
-<FadeIn delay={0.1}>
-  <div className="text-2xl font-semibold text-[#663399]">
-    ${product.price.toLocaleString()}
-  </div>
-</FadeIn>
+            <FadeIn delay={0.1}>
+              <div className="text-2xl font-semibold text-[#663399]">
+                ${product.price.toLocaleString()}
+              </div>
+            </FadeIn>
 
-<FadeIn delay={0.15}>
-  <div className="text-sm text-gray-500">
-    {product?.stock! > 0 ? (
-      <span className="text-green-600">In stock ({product.stock})</span>
-    ) : (
-      <span className="text-red-600">Out of stock</span>
-    )}
-  </div>
-</FadeIn>
+            <FadeIn delay={0.15}>
+              <div className="text-sm text-gray-500">
+                {product?.stock && product.stock > 0 ? (
+                  <span className="text-green-600">
+                    In stock ({product.stock})
+                  </span>
+                ) : (
+                  <span className="text-red-600">Out of stock</span>
+                )}
+              </div>
+            </FadeIn>
 
-<FadeIn delay={0.2}>
-  <div className="flex gap-3">
-  <button
-    onClick={handleAddToCart}
-    disabled={isMutating || product?.stock! < 1}
-    className="flex items-center gap-2 px-4 py-2 rounded bg-[#663399] hover:bg-[#563289] text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-  >
-    {isMutating ? (
-      <>
-        <Loader2 className="w-4 h-4 animate-spin" />
-        Adding...
-      </>
-    ) : (
-      <>
-        <ShoppingCart className="w-4 h-4" />
-        Add to Cart
-      </>
-    )}
-  </button>
+            <FadeIn delay={0.2}>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleAddToCart}
+                disabled={isMutating || !product || (product.stock ?? 0) < 1}
+                  className="flex items-center gap-2 px-4 py-2 rounded bg-[#663399] hover:bg-[#563289] text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isMutating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-4 h-4" />
+                      Add to Cart
+                    </>
+                  )}
+                </button>
+              </div>
+            </FadeIn>
 
-  
-  </div>
-</FadeIn>
-
-<FadeIn delay={0.25}>
-  <div className="flex items-center gap-4 pt-4">
-    <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
-      <Heart className="w-4 h-4" />
-      Save
-    </button>
-    <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
-      <Share2 className="w-4 h-4" />
-      Share
-    </button>
-    {product.type === "digital" && product.file?.url && (
-      <a
-        href={product.file.url}
-        download
-        className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
-      >
-        <Download className="w-4 h-4" />
-        Preview
-      </a>
-    )}
-  </div>
-</FadeIn>
-
+            <FadeIn delay={0.25}>
+              <div className="flex items-center gap-4 pt-4">
+                <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
+                  <Heart className="w-4 h-4" />
+                  Save
+                </button>
+                <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
+                  <Share2 className="w-4 h-4" />
+                  Share
+                </button>
+                {product.type === "digital" && product.file?.url && (
+                  <a
+                    href={product.file.url}
+                    download
+                    className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
+                  >
+                    <Download className="w-4 h-4" />
+                    Preview
+                  </a>
+                )}
+              </div>
+            </FadeIn>
           </div>
         </div>
 
@@ -227,5 +236,5 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         </div>
       </div>
     </>
-  )
+  );
 }

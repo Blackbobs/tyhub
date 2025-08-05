@@ -3,26 +3,30 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/auth-store";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import SearchInput from "./search-input";
 import CartModal from "./cart-modal";
 
 
 export default function Header() {
+  const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { user, logout } = useAuthStore();
   const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
-  const isAuthenticated = !!user;
+const isAuthenticated = user !== null;
+
+if (pathname.includes("/auth/login") || pathname.includes("/auth/signup")) {
+  return null;
+}
 
 
   const handleLogout = () => {
     logout();
     setUserMenuOpen(false);
-    router.push("/");
+    router.replace("/auth/login");
   };
 
   const menuVariants = {
@@ -59,35 +63,14 @@ export default function Header() {
           <div className="flex-shrink-0">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link href="/" className="text-xl font-bold text-[#663399]">
-                HubDigital
+                TyFits
               </Link>
             </motion.div>
           </div>
 
-          {/* Desktop Navigation */}
-          {/* <nav className="hidden md:flex space-x-8">
-            <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-              <Link href="/" className="text-gray-700 hover:text-[#663399] transition-colors">
-                Home
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-              <Link href="/products" className="text-gray-700 hover:text-[#663399] transition-colors">
-                Products
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-              <Link href="/categories" className="text-gray-700 hover:text-[#663399] transition-colors">
-                Categories
-              </Link>
-            </motion.div>
-          </nav> */}
+          
 
           <div className="flex items-center space-x-4">
-            <div className="hidden md:block relative">
-              <SearchInput />
-            </div>
-
             <CartModal />
 
             <div className="relative">
@@ -139,34 +122,13 @@ export default function Header() {
                             Account
                           </Link>
                         </motion.div>
-                        <motion.div
-                          variants={prefersReducedMotion ? {} : itemVariants}
-                        >
-                          <Link
-                            href="/account?tab=orders"
-                            onClick={() => setUserMenuOpen(false)}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          >
-                            Orders
-                          </Link>
-                        </motion.div>
-                        <motion.div
-                          variants={prefersReducedMotion ? {} : itemVariants}
-                        >
-                          <Link
-                            href="/account?tab=downloads"
-                            onClick={() => setUserMenuOpen(false)}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          >
-                            Downloads
-                          </Link>
-                        </motion.div>
+                    
                         <motion.button
                           onClick={handleLogout}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           variants={prefersReducedMotion ? {} : itemVariants}
                         >
-                          Sign out
+                          log out
                         </motion.button>
                       </>
                     ) : (
@@ -264,36 +226,7 @@ export default function Header() {
                     }
               }
             >
-              {/* <div className="px-2 pt-2 pb-4 space-y-1">
-                <motion.div variants={prefersReducedMotion ? {} : itemVariants} whileHover={{ x: 5 }}>
-                  <Link
-                    href="/"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#663399] hover:bg-gray-50"
-                  >
-                    Home
-                  </Link>
-                </motion.div>
-                <motion.div variants={prefersReducedMotion ? {} : itemVariants} whileHover={{ x: 5 }}>
-                  <Link
-                    href="/products"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#663399] hover:bg-gray-50"
-                  >
-                    Products
-                  </Link>
-                </motion.div>
-                <motion.div variants={prefersReducedMotion ? {} : itemVariants} whileHover={{ x: 5 }}>
-                  <Link
-                    href="/categories"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#663399] hover:bg-gray-50"
-                  >
-                    Categories
-                  </Link>
-                </motion.div>
-              </div> */}
-              <div className="pt-4 pb-3 border-t border-gray-200">
+             <div className="pt-4 pb-3 border-t border-gray-200">
                 <div className="px-2 space-y-1">
                   {isAuthenticated ? (
                     <>
@@ -309,30 +242,7 @@ export default function Header() {
                           Account
                         </Link>
                       </motion.div>
-                      <motion.div
-                        variants={prefersReducedMotion ? {} : itemVariants}
-                        whileHover={{ x: 5 }}
-                      >
-                        <Link
-                          href="/account?tab=orders"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#663399] hover:bg-gray-50"
-                        >
-                          Orders
-                        </Link>
-                      </motion.div>
-                      <motion.div
-                        variants={prefersReducedMotion ? {} : itemVariants}
-                        whileHover={{ x: 5 }}
-                      >
-                        <Link
-                          href="/account?tab=downloads"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-[#663399] hover:bg-gray-50"
-                        >
-                          Downloads
-                        </Link>
-                      </motion.div>
+                   
                       <motion.button
                         onClick={() => {
                           handleLogout();
@@ -375,11 +285,7 @@ export default function Header() {
                   )}
                 </div>
               </div>
-              <div className="px-2 pt-4 pb-2">
-                <div className="relative">
-                  <SearchInput />
-                </div>
-              </div>
+             
             </motion.div>
           )}
         </AnimatePresence>

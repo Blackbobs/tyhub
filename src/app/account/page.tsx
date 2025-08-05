@@ -1,59 +1,59 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/auth-store";
+import AccountOrders from "@/components/account/account-orders";
+import { getUserOrders } from "@/services/user.service";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function AccountPage() {
-  const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
+  const { user, logout } = useAuthStore();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/auth/login");
-    }
-  }, [isAuthenticated, router]);
+  const { data: orders, isLoading: isOrdersLoading } = useQuery({
+    queryKey: ["userOrders"],
+    queryFn: getUserOrders,
+    enabled: !!user,
+  });
 
-  if (!isAuthenticated || !user) {
-    return null;
+  if (!user) {
+    return (
+      <div className="container py-8 md:py-12 text-center">
+        <h1 className="text-2xl font-bold mb-4">
+          Please log in to view your account
+        </h1>
+        <Link href="/auth/login" passHref>
+          <small className="inline-block px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition">
+            Login
+          </small>
+        </Link>
+      </div>
+    );
   }
 
   return (
     <div className="container py-8 md:py-12">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 p-4">
         <div>
           <h1 className="text-3xl font-bold">My Account</h1>
-          <p className="text-muted-foreground">Welcome back, {user.name}</p>
+          <p className="text-gray-500">
+            Welcome back, {user?.username || user?.email}
+          </p>
         </div>
+
         <button
           onClick={() => {
-            useAuthStore.getState().logout();
+            logout();
             router.push("/");
           }}
+          className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 transition"
         >
           Sign Out
         </button>
       </div>
 
-      {/* <Tabs defaultValue="orders" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-8">
-          <TabsTrigger value="orders">Orders</TabsTrigger>
-          <TabsTrigger value="downloads">Downloads</TabsTrigger>
-          <TabsTrigger value="account">Account Details</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="orders" className="space-y-4">
-          <AccountOrders />
-        </TabsContent>
-
-        <TabsContent value="downloads" className="space-y-4">
-          <AccountDownloads />
-        </TabsContent>
-
-        <TabsContent value="account" className="space-y-4">
-          <AccountDetails />
-        </TabsContent>
-      </Tabs> */}
+      <AccountOrders orders={orders || []} isLoading={isOrdersLoading} />
     </div>
   );
 }

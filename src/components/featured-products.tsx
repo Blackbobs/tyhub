@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ProductCard from "./product-card";
-import { Loader2 } from "lucide-react";
+import { Loader2, PackageX } from "lucide-react";
 import { getProducts, Product } from "@/services/product.service";
 
 export default function FeaturedProducts() {
@@ -38,6 +38,15 @@ export default function FeaturedProducts() {
     return (
       <div className="flex justify-center items-center py-12 text-red-500">
         {error}
+      </div>
+    );
+  }
+
+   if (products.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+        <PackageX className="w-10 h-10 mb-2" />
+        <p>No products available at the moment.</p>
       </div>
     );
   }

@@ -1,23 +1,23 @@
 import { ShoppingBag } from "lucide-react"
 import Link from "next/link"
 import HeroSection from "@/components/hero-section"
-import Newsletter from "@/components/newsletter"
+// import Newsletter from "@/components/newsletter"
 import type { Metadata } from "next"
 import FeaturedProducts from "@/components/featured-products"
 import AuthGuard from "@/lib/auth-guard"
 
 
 export const metadata: Metadata = {
-  title: "HubDigital | Premium Products for Your Lifestyle",
+  title: "TyHub | Premium Products for Your Gym Lifestyle",
   description:
-    "Discover our handpicked selection of premium products, curated just for you. Fast shipping and secure checkout.",
+    "Discover our handpicked selection of gym products, curated just for you. Fast shipping and secure checkout.",
   openGraph: {
     images: [
       {
         url: "/og-home.jpg",
         width: 1200,
         height: 630,
-        alt: "HubDigital - Premium Products for Your Lifestyle",
+        alt: "TyHub - Gym Products for Your Lifestyle",
       },
     ],
   },
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <AuthGuard>
-      <main className="flex min-h-screen flex-col bg-[#ffffff]">
+      <main className="flex min-h-screen flex-col bg-[#ffffff] px-4">
         <HeroSection />
 
         <section className="container px-4 py-12 md:py-16 lg:py-24" id="featured">
@@ -123,7 +123,7 @@ export default function Home() {
           </div>
         </section>
 
-        <Newsletter />
+        {/* <Newsletter /> */}
       </main>
     </AuthGuard>
   )

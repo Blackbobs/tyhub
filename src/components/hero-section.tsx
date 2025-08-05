@@ -55,14 +55,14 @@ export default function HeroSection() {
             </motion.div>
           </div>
           <motion.div
-            className="relative aspect-[4/3] md:aspect-square rounded-lg overflow-hidden bg-white shadow-lg"
+            className="relative aspect-[4/3] md:aspect-square rounded-lg overflow-hidden"
             initial={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
             animate={prefersReducedMotion ? {} : { opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <div className="absolute flex items-center justify-center">
               <motion.img
-                src="/placeholder.svg?height=300&width=300"
+                src="/gym.jpg"
                 alt="Featured product"
                 className="object-cover w-full h-full"
                 whileHover={{ scale: 1.05 }}

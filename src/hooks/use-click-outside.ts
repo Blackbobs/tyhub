@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, type RefObject } from "react"
+import { useEffect } from "react"
 
 export function useOnClickOutside(
   ref: React.RefObject<HTMLElement | null>,

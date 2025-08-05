@@ -2,15 +2,13 @@
 'use client'
 
 import ProductCard from "./product-card"
-import { Loader2 } from "lucide-react"
+import { Loader2, PackageX } from "lucide-react"
 import { useProducts } from "@/hooks/use-product"
 
-interface ProductGridProps {
-  searchQuery?: string
-}
 
-export default function ProductGrid({ searchQuery = "" }: ProductGridProps) {
-  const { data: products, isLoading, error } = useProducts(searchQuery)
+
+export default function ProductGrid() {
+  const { data: products, isLoading, error } = useProducts()
 
   if (isLoading) {
     return (
@@ -30,27 +28,14 @@ export default function ProductGrid({ searchQuery = "" }: ProductGridProps) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <span className="text-muted-foreground">
-            Showing {products?.length || 0} {searchQuery ? "results" : "products"}
-          </span>
-        </div>
-        <select className="p-2 border rounded-md">
-          <option>Featured</option>
-          <option>Price: Low to High</option>
-          <option>Price: High to Low</option>
-          <option>Newest</option>
-        </select>
-      </div>
+     
 
-      {!products?.length ? (
-        <div className="text-center py-12">
-          <h3 className="text-lg font-medium mb-2">No products found</h3>
-          <p className="text-muted-foreground mb-4">
-            {searchQuery
-              ? "We couldn't find any products matching your search."
-              : "No products available at the moment."}
+     {!products?.length ? (
+        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <PackageX className="w-10 h-10 mb-2" />
+          <h3 className="text-lg font-medium mb-2">No products available</h3>
+          <p className="text-muted-foreground">
+            Please check back later.
           </p>
         </div>
       ) : (

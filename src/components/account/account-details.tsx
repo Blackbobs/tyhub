@@ -1,122 +1,181 @@
-"use client";
+'use client';
 
-import type React from "react";
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
+import { updateUserDetails, changePassword } from '@/services/user.service';
+import { motion } from 'framer-motion';
+import { useReducedMotion } from '@/hooks/use-reduced-motion';
+import { AxiosError } from 'axios';
 
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useAuthStore } from "@/store/auth-store";
-import { motion } from "framer-motion";
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
+interface User {
+  username: string;
+  email: string;
+  address: string;
+  phone: string;
+};
 
-export default function AccountDetails() {
-  const { user, updateUser } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+export default function AccountDetails({
+  user,
+  isLoading,
+}: {
+  user: User;
+  isLoading: boolean;
+}) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const prefersReducedMotion = useReducedMotion();
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [isPasswordEditing, setIsPasswordEditing] = useState(false);
+
   const [formData, setFormData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "",
+    username: user?.username || '',
+    email: user?.email || '',
+    address: user?.address || '',
+    phone: user?.phone || '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
+  const updateUserMutation = useMutation({
+    mutationFn: updateUserDetails,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userDetails'] });
+
+      toast({
+        title: 'Success',
+        description: 'Your details have been updated.',
+      });
+      setIsEditing(false);
+    },
+    onError: () => {
+      toast({
+        title: 'Error',
+        description: 'Failed to update details.',
+      });
+    },
+  });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: changePassword,
+    onSuccess: () => {
+      toast({
+        title: 'Success',
+        description: 'Your password has been changed.',
+      });
+      setIsPasswordEditing(false);
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+    },
+    onError: (error:  AxiosError<{ message: string }>) => {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to change password.',
+      });
+    },
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      // In a real app, this would make an API call to update user details
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      updateUser({
-        ...user!,
-        name: formData.name,
-        email: formData.email,
-      });
-
-      toast({
-        title: "Account updated",
-        description: "Your account details have been updated successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Update failed",
-        description: "There was a problem updating your account details.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPasswordData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsPasswordLoading(true);
-
-    try {
-      // In a real app, this would make an API call to update password
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      toast({
-        title: "Password updated",
-        description: "Your password has been updated successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Update failed",
-        description: "There was a problem updating your password.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsPasswordLoading(false);
-    }
+    updateUserMutation.mutate(formData);
   };
 
-  if (!user) return null;
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: 'Error',
+        description: 'Passwords do not match.', 
+      });
+      return;
+    }
+    changePasswordMutation.mutate({
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword,
+    });
+  };
+
+  if (isLoading) {
+    return <div className="text-center py-8">Loading...</div>;
+  }
 
   return (
     <div className="space-y-6">
+      {/* Account Details */}
       <motion.div
         className="border rounded-lg overflow-hidden shadow-sm"
         initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
         animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="p-4 border-b">
-          <h3 className="text-lg font-medium">Account Details</h3>
-          <p className="text-sm text-gray-500">
-            Update your account information
-          </p>
+        <div className="p-4 border-b flex justify-between items-center">
+          <div>
+            <h3 className="text-lg font-medium">Account Details</h3>
+            <p className="text-sm text-gray-500">Manage your account information</p>
+          </div>
+          {!isEditing ? (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="px-4 py-1 text-sm border rounded hover:bg-gray-100"
+            >
+              Edit
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsEditing(false)}
+                className="px-4 py-1 text-sm border rounded hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={updateUserMutation.isPending                }
+                className="px-4 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-500 disabled:opacity-50"
+              >
+                {updateUserMutation.isPending ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          )}
         </div>
+
         <form onSubmit={handleSubmit}>
           <div className="p-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="name" className="block text-sm font-medium">
-                  Full Name
+              <div className="space-y-1">
+                <label htmlFor="username" className="text-sm font-medium">
+                  Username
                 </label>
                 <input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#663399] focus:border-transparent"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className="w-full border px-3 py-2 rounded"
                 />
               </div>
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium">
+              <div className="space-y-1">
+                <label htmlFor="email" className="text-sm font-medium">
                   Email
                 </label>
                 <input
@@ -124,13 +183,13 @@ export default function AccountDetails() {
                   name="email"
                   type="email"
                   value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#663399] focus:border-transparent"
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className="w-full border px-3 py-2 rounded"
                 />
               </div>
-              <div className="space-y-2">
-                <label htmlFor="phone" className="block text-sm font-medium">
+              <div className="space-y-1">
+                <label htmlFor="phone" className="text-sm font-medium">
                   Phone Number
                 </label>
                 <input
@@ -138,229 +197,116 @@ export default function AccountDetails() {
                   name="phone"
                   type="tel"
                   value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#663399] focus:border-transparent"
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className="w-full border px-3 py-2 rounded"
+                />
+              </div>
+              <div className="space-y-1 md:col-span-2">
+                <label htmlFor="address" className="text-sm font-medium">
+                  Address
+                </label>
+                <input
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className="w-full border px-3 py-2 rounded"
                 />
               </div>
             </div>
-
-            <div className="pt-2">
-              <h3 className="font-medium mb-2">Shipping Address</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2 md:col-span-2">
-                  <label
-                    htmlFor="address"
-                    className="block text-sm font-medium"
-                  >
-                    Address
-                  </label>
-                  <input
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#663399] focus:border-transparent"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="city" className="block text-sm font-medium">
-                    City
-                  </label>
-                  <input
-                    id="city"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#663399] focus:border-transparent"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="state" className="block text-sm font-medium">
-                    State/Province
-                  </label>
-                  <input
-                    id="state"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#663399] focus:border-transparent"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label
-                    htmlFor="zipCode"
-                    className="block text-sm font-medium"
-                  >
-                    ZIP/Postal Code
-                  </label>
-                  <input
-                    id="zipCode"
-                    name="zipCode"
-                    value={formData.zipCode}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#663399] focus:border-transparent"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label
-                    htmlFor="country"
-                    className="block text-sm font-medium"
-                  >
-                    Country
-                  </label>
-                  <input
-                    id="country"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#663399] focus:border-transparent"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="border-t p-4">
-            <motion.button
-              type="submit"
-              className="bg-[#663399] hover:bg-[#563289] text-white px-4 py-2 rounded disabled:opacity-50 flex items-center"
-              disabled={isLoading}
-              whileHover={!isLoading ? { scale: 1.05 } : {}}
-              whileTap={!isLoading ? { scale: 0.95 } : {}}
-            >
-              {isLoading ? (
-                <>
-                  <motion.svg
-                    className="mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 1,
-                      repeat: Number.POSITIVE_INFINITY,
-                      ease: "linear",
-                    }}
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </motion.svg>
-                  Saving...
-                </>
-              ) : (
-                "Save Changes"
-              )}
-            </motion.button>
           </div>
         </form>
       </motion.div>
 
+      {/* Change Password */}
       <motion.div
         className="border rounded-lg overflow-hidden shadow-sm"
         initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
         animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <div className="p-4 border-b">
-          <h3 className="text-lg font-medium">Change Password</h3>
-          <p className="text-sm text-gray-500">Update your password</p>
-        </div>
-        <form onSubmit={handlePasswordSubmit}>
-          <div className="p-4 space-y-4">
-            <div className="space-y-2">
-              <label
-                htmlFor="currentPassword"
-                className="block text-sm font-medium"
-              >
-                Current Password
-              </label>
-              <input
-                id="currentPassword"
-                type="password"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#663399] focus:border-transparent"
-              />
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="newPassword"
-                className="block text-sm font-medium"
-              >
-                New Password
-              </label>
-              <input
-                id="newPassword"
-                type="password"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#663399] focus:border-transparent"
-              />
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium"
-              >
-                Confirm New Password
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#663399] focus:border-transparent"
-              />
-            </div>
+        <div className="p-4 border-b flex justify-between items-center">
+          <div>
+            <h3 className="text-lg font-medium">Change Password</h3>
+            <p className="text-sm text-gray-500">Update your password</p>
           </div>
-          <div className="border-t p-4">
-            <motion.button
-              type="submit"
-              className="bg-[#663399] hover:bg-[#563289] text-white px-4 py-2 rounded disabled:opacity-50 flex items-center"
-              disabled={isPasswordLoading}
-              whileHover={!isPasswordLoading ? { scale: 1.05 } : {}}
-              whileTap={!isPasswordLoading ? { scale: 0.95 } : {}}
+          {!isPasswordEditing ? (
+            <button
+              onClick={() => setIsPasswordEditing(true)}
+              className="px-4 py-1 text-sm border rounded hover:bg-gray-100"
             >
-              {isPasswordLoading ? (
-                <>
-                  <motion.svg
-                    className="mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 1,
-                      repeat: Number.POSITIVE_INFINITY,
-                      ease: "linear",
-                    }}
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </motion.svg>
-                  Updating...
-                </>
-              ) : (
-                "Update Password"
-              )}
-            </motion.button>
-          </div>
-        </form>
+              Change
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsPasswordEditing(false)}
+                className="px-4 py-1 text-sm border rounded hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                onClick={handlePasswordSubmit}
+                disabled={changePasswordMutation.isPending}
+                className="px-4 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-500 disabled:opacity-50"
+              >
+                {changePasswordMutation.isPending ? 'Updating...' : 'Update'}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {isPasswordEditing && (
+          <form onSubmit={handlePasswordSubmit}>
+            <div className="p-4 space-y-4">
+              <div className="space-y-1">
+                <label htmlFor="currentPassword" className="text-sm font-medium">
+                  Current Password
+                </label>
+                <input
+                  id="currentPassword"
+                  name="currentPassword"
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label htmlFor="newPassword" className="text-sm font-medium">
+                  New Password
+                </label>
+                <input
+                  id="newPassword"
+                  name="newPassword"
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label htmlFor="confirmPassword" className="text-sm font-medium">
+                  Confirm New Password
+                </label>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+            </div>
+          </form>
+        )}
       </motion.div>
     </div>
   );

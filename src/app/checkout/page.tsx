@@ -1,14 +1,14 @@
 "use client"
 
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+// import { useRouter } from "next/navigation"
 
 export default function CheckoutRedirectPage() {
-  const router = useRouter()
+  // const router = useRouter()
 
   useEffect(() => {
     // Redirect to Shopify checkout
-    window.location.href = "/api/shopify/checkout"
+    // window.location.href = "/api/shopify/checkout"
   }, [])
 
   return (

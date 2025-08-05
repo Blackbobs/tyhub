@@ -7,10 +7,10 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <Link href="/" className="inline-block mb-4">
-              <span className="text-xl font-bold text-[#663399]">HubDigital</span>
+              <span className="text-xl font-bold text-[#663399]">TyFits</span>
             </Link>
             <p className="text-gray-500 mb-4 max-w-xs">
-              Your one-stop shop for premium products delivered directly to your doorstep.
+              Your one-stop shop for premium gym products delivered directly to your doorstep.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-500 hover:text-[#663399]" aria-label="Facebook">
@@ -167,12 +167,6 @@ export default function Footer() {
 
         <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm">&copy; {new Date().getFullYear()} HubDigital. All rights reserved.</p>
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            <img src="/placeholder.svg?height=30&width=50" alt="Visa" className="h-8" />
-            <img src="/placeholder.svg?height=30&width=50" alt="Mastercard" className="h-8" />
-            <img src="/placeholder.svg?height=30&width=50" alt="PayPal" className="h-8" />
-            <img src="/placeholder.svg?height=30&width=50" alt="Apple Pay" className="h-8" />
-          </div>
         </div>
       </div>
     </footer>

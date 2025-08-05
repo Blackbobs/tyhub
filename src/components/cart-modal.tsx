@@ -16,7 +16,7 @@ export default function CartModal() {
   const {
     cart,
     isLoading,
-    error,
+    // error,
     updateCartItem,
     removeFromCart,
     clearCart,
@@ -27,16 +27,24 @@ export default function CartModal() {
   const modalRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  // Initialize quantity inputs when cart loads
+
   useEffect(() => {
-    if (cart?.items) {
-      const initialQuantities = cart.items.reduce((acc, item) => {
-        acc[item.product._id] = item.quantity;
-        return acc;
-      }, {} as Record<string, number>);
+  if (cart?.items) {
+    const initialQuantities = cart.items.reduce((acc, item) => {
+      acc[item.product._id] = item.quantity;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const hasChanged = Object.keys(initialQuantities).some(
+      (key) => quantityInputs[key] !== initialQuantities[key]
+    );
+
+    if (hasChanged) {
       setQuantityInputs(initialQuantities);
     }
-  }, [cart?.items]);
+  }
+}, [cart?.items, quantityInputs]);
+
 
   // Close modal when clicking outside
   useOnClickOutside(modalRef, () => setIsOpen(false));
@@ -93,7 +101,7 @@ export default function CartModal() {
   const handleUpdateQuantity = async (productId: string, quantity: number) => {
     try {
       await updateCartItem({ productId, quantity });
-    } catch (error) {
+    } catch {
       // Error handling is done in the mutation
     }
   };
@@ -101,7 +109,7 @@ export default function CartModal() {
   const handleRemoveItem = async (productId: string) => {
     try {
       await removeFromCart(productId);
-    } catch (error) {
+    } catch {
       // Error handling is done in the mutation
     }
   };
@@ -109,7 +117,7 @@ export default function CartModal() {
   const handleClearCart = async () => {
     try {
       await clearCart();
-    } catch (error) {
+    } catch {
       // Error handling is done in the mutation
     }
   };
@@ -117,7 +125,7 @@ export default function CartModal() {
   const handleCheckout = async () => {
     try {
       await checkout();
-    } catch (error) {
+    } catch {
       // Error handling is done in the mutation
     }
   };
@@ -220,7 +228,7 @@ export default function CartModal() {
                       Your cart is empty
                     </h3>
                     <p className="text-gray-500 mb-6">
-                      Looks like you haven't added anything to your cart yet.
+                      Looks like you haven&apos;t added anything to your cart yet.
                     </p>
                     <motion.button
                       onClick={() => setIsOpen(false)}

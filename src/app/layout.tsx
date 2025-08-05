@@ -7,9 +7,9 @@ import Footer from "@/components/footer";
 import ReactQueryProvider from "@/providers/react-query-provider";
 
 export const metadata: Metadata = {
-  title: "HubDigital | Premium Products for Your Lifestyle",
+  title: "TyHub | Premium Products for Your Gym Lifestyle",
   description:
-    "Shop our curated collection of high-quality products designed to enhance your everyday life. Fast shipping and secure checkout.",
+    "Discover our handpicked selection of gym products, curated just for you. Fast shipping and secure checkout.",
 };
 
 export default function RootLayout({

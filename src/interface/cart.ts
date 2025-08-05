@@ -1,4 +1,4 @@
-import { Product } from "@/services/product.service";
+
 
 export interface ICartItem {
   product: {
@@ -13,7 +13,7 @@ export interface ICartItem {
     quantity: number;
   }
 
-  export interface ICart extends Document {
+  export interface ICart {
     _id: string;
     user: string;
     items: ICartItem[];
