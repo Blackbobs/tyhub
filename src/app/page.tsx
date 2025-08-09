@@ -17,7 +17,7 @@ export const metadata: Metadata = {
         url: "/og-home.jpg",
         width: 1200,
         height: 630,
-        alt: "TyHub - Gym Products for Your Lifestyle",
+        alt: "TyHub - premium Products for Your Lifestyle",
       },
     ],
   },
@@ -25,7 +25,6 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <AuthGuard>
       <main className="flex min-h-screen flex-col bg-[#ffffff] px-4">
         <HeroSection />
 
@@ -123,8 +122,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* <Newsletter /> */}
+       
       </main>
-    </AuthGuard>
+    
   )
 }

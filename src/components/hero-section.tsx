@@ -54,7 +54,7 @@ export default function HeroSection() {
               </Link> */}
             </motion.div>
           </div>
-          <motion.div
+          {/* <motion.div
             className="relative aspect-[4/3] md:aspect-square rounded-lg overflow-hidden"
             initial={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
             animate={prefersReducedMotion ? {} : { opacity: 1, x: 0 }}
@@ -69,7 +69,7 @@ export default function HeroSection() {
                 transition={{ duration: 0.5 }}
               />
             </div>
-          </motion.div>
+          </motion.div> */}
         </div>
       </div>
     </section>

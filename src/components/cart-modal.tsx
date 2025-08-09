@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { Loader2, ShoppingCart, X, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function CartModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,6 +28,17 @@ export default function CartModal() {
   } = useCart();
   const modalRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  const handleCartClick = () => {
+    if (!user) {
+      router.push("/auth/login");
+    } else {
+      setIsOpen(true);
+    }
+  };
+
 
 
   useEffect(() => {
@@ -134,7 +147,7 @@ export default function CartModal() {
     <div>
       {/* Cart Button with Badge */}
       <motion.button
-        onClick={() => setIsOpen(true)}
+        onClick={handleCartClick}
         className="relative p-2 text-gray-700 hover:text-gray-900 transition-colors"
         aria-label="Open cart"
         whileHover={{ scale: 1.1 }}

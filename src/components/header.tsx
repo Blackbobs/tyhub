@@ -63,7 +63,7 @@ if (pathname.includes("/auth/login") || pathname.includes("/auth/signup")) {
           <div className="flex-shrink-0">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link href="/" className="text-xl font-bold text-[#663399]">
-                TyFits
+                TyHub
               </Link>
             </motion.div>
           </div>

@@ -9,7 +9,7 @@ import ReactQueryProvider from "@/providers/react-query-provider";
 export const metadata: Metadata = {
   title: "TyHub | Premium Products for Your Gym Lifestyle",
   description:
-    "Discover our handpicked selection of gym products, curated just for you. Fast shipping and secure checkout.",
+    "Discover our handpicked selection of premium products, curated just for you. Fast shipping and secure checkout.",
 };
 
 export default function RootLayout({

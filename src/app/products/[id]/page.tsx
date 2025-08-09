@@ -9,6 +9,7 @@ import { use, useEffect, useState } from "react";
 import { useProduct, useRelatedProducts } from "@/hooks/use-product";
 import { useCart } from "@/hooks/useCart";
 import Image from "next/image";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function ProductPage({
   params,
@@ -21,6 +22,7 @@ export default function ProductPage({
   const [selectedImage, setSelectedImage] = useState("");
   const router = useRouter();
   const { addToCart, isMutating } = useCart();
+  const { user } = useAuthStore(); 
 
   useEffect(() => {
     if (product?.images?.[0]?.url) {
@@ -31,38 +33,18 @@ export default function ProductPage({
   const handleAddToCart = async () => {
     if (!product) return;
 
+    if (!user) {
+      router.push("/auth/login");
+      return;
+    }
+
     try {
       await addToCart({ productId: product._id, quantity: 1 });
     } catch (error) {
       console.log(error);
     }
   };
-  // const handleBuyNow = async () => {
-  //   if (!product) return
-
-  //   if (product.type === 'digital' && !user) {
-  //     toast({
-  //       title: "Authentication required",
-  //       description: "Please log in to purchase digital products.",
-  //     })
-  //     router.push("/auth/login")
-  //     return
-  //   }
-
-  //   // setAddingToCart(true)
-  //   try {
-  //     await addToCart({ productId: product._id, quantity: 1 });
-
-  //   } catch (error) {
-  //     toast({
-  //       title: "Error",
-  //       description: "Failed to proceed to checkout",
-  //     })
-  //   } finally {
-  //     // setAddingToCart(false)
-  //   }
-  // }
-
+ 
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-12 flex items-center justify-center">

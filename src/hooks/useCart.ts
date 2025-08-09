@@ -9,12 +9,14 @@ import {
 } from '@/services/cart.service';
 import { useToast } from './use-toast';
 import { ICart } from '@/interface/cart';
+import { useAuthStore } from '@/store/auth-store';
 
 export const useCart = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const {user} = useAuthStore()
 
-  // Normal data fetching
+ 
   const { 
     data: cart = { items: [] }, 
     isLoading, 
@@ -23,13 +25,13 @@ export const useCart = () => {
   } = useQuery({
     queryKey: ['cart'],
     queryFn: getCart,
+    enabled: !!user
   });
 
   // Add to cart mutation
   const addToCartMutation = useMutation({
     mutationFn: addToCart,
     onSuccess: () => {
-      // Correct invalidation syntax
       queryClient.invalidateQueries({ queryKey: ['cart'] });
       toast({
         title: 'Added to cart',
@@ -44,7 +46,6 @@ export const useCart = () => {
     }
   });
 
-  // Update cart item mutation
   const updateCartItemMutation = useMutation({
     mutationFn: updateCartItem,
     onSuccess: () => {
@@ -58,7 +59,7 @@ export const useCart = () => {
     }
   });
 
-  // Remove from cart mutation
+
   const removeFromCartMutation = useMutation({
     mutationFn: removeFromCart,
     onMutate: async (productId) => {
@@ -89,8 +90,7 @@ export const useCart = () => {
       });
     }
   });
-
-  // Clear cart mutation
+  
   const clearCartMutation = useMutation({
     mutationFn: clearCart,
     onMutate: async () => {

@@ -8,6 +8,8 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { Loader2, ShoppingBag } from "lucide-react";
 import { Product } from "@/services/product.service";
 import { useCart } from "@/hooks/useCart";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/auth-store";
 
 interface ProductCardProps {
   product: Product;
@@ -18,15 +20,21 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addToCart, isMutating } = useCart();
   const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const { user } = useAuthStore();
+  const router = useRouter();
 
   const handleAddToCart = async () => {
+    if (!user) {
+      router.push("/auth/login");
+      return;
+    }
+    
     try {
       await addToCart({ productId: product._id, quantity: 1 });
     } catch {
       // Error handling is done in the mutation
     }
   };
-
   const cardVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: (i: number) => ({
