@@ -16,7 +16,7 @@ export default function TermsConditions() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
           <p>
-            By using TyHub ("Site"), you agree to these Terms. If you disagree, do not use the Site.
+            By using TyHub (&quot;Site&quot;), you agree to these Terms. If you disagree, do not use the Site.
           </p>
         </section>
 

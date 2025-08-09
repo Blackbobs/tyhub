@@ -16,7 +16,7 @@ export default function PrivacyPolicy() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
           <p>
-            Welcome to TyHub ("we," "our," or "us"). We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or make a purchase from us.
+            Welcome to TyHub (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or make a purchase from us.
           </p>
         </section>
 
@@ -67,7 +67,7 @@ export default function PrivacyPolicy() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">7. Changes to This Policy</h2>
           <p>
-            We may update this policy. Changes will be posted on this page with a revised "Last Updated" date.
+            We may update this policy. Changes will be posted on this page with a revised &quot;Last Updated&quot; date.
           </p>
         </section>
 

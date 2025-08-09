@@ -4,7 +4,6 @@ import HeroSection from "@/components/hero-section"
 // import Newsletter from "@/components/newsletter"
 import type { Metadata } from "next"
 import FeaturedProducts from "@/components/featured-products"
-import AuthGuard from "@/lib/auth-guard"
 
 
 export const metadata: Metadata = {
