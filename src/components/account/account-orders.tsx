@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { Order } from '@/interface/order';
 import { formatDate } from '@/utils/format-date';
+import Image from 'next/image';
 
 interface AccountOrdersProps {
   orders: Order[];
@@ -42,7 +43,7 @@ export default function AccountOrders({
     return (
       <div className="text-center py-12">
         <h3 className="text-lg font-medium mb-2">
-          You haven't placed any orders yet
+          You haven&apos;t placed any orders yet
         </h3>
         <p className="text-gray-500 mb-4">
           Once you place an order, it will appear here.
@@ -129,10 +130,11 @@ export default function AccountOrders({
                   >
                     <div className="flex items-center gap-2">
                       {item.product.images?.[0]?.url ? (
-                        <img
+                        <Image
                           src={item.product.images[0].url}
                           alt={item.product.title}
                           className="h-10 w-10 rounded-md object-cover"
+                          priority
                         />
                       ) : (
                         <div className="h-10 w-10 rounded-md bg-gray-100 flex items-center justify-center">
