@@ -6,12 +6,17 @@ import AccountOrders from "@/components/account/account-orders";
 import { getUserOrders } from "@/services/user.service";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Order } from "@/interface/order";
 
 export default function AccountPage() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
 
-  const { data: orders, isLoading: isOrdersLoading } = useQuery({
+  const { 
+    data: orders, 
+    isLoading: isOrdersLoading,
+    error: ordersError 
+  } = useQuery<Order[]>({
     queryKey: ["userOrders"],
     queryFn: getUserOrders,
     enabled: !!user,
@@ -23,17 +28,15 @@ export default function AccountPage() {
         <h1 className="text-2xl font-bold mb-4">
           Please log in to view your account
         </h1>
-        <Link href="/auth/login" passHref>
-          <small className="inline-block px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition">
-            Login
-          </small>
+        <Link href="/auth/login" className="inline-block px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition">
+          Login
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="container py-8 md:py-12">
+    <div className="container p-8 md:py-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 p-4">
         <div>
           <h1 className="text-3xl font-bold">My Account</h1>
@@ -53,7 +56,11 @@ export default function AccountPage() {
         </button>
       </div>
 
-      <AccountOrders orders={orders || []} isLoading={isOrdersLoading} />
+      <AccountOrders 
+        orders={orders || []} 
+        isLoading={isOrdersLoading} 
+        error={ordersError as Error | null}
+      />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, User, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/auth-store";
 import { useMutation } from "@tanstack/react-query";
@@ -81,139 +81,155 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="container max-w-md mx-auto py-12 px-5">
-      <div className="space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-[#663399]">
-            Create an account
-          </h1>
-          <p className="text-muted-foreground text-gray-500">
-            Enter your information to create an account
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Full Name */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="username">Full Name</label>
-            <input
-              id="username"
-              {...register("username", { required: true })}
-              className="border-2 rounded-md p-2 border-[#663399] bg-transparent focus:outline-none"
-              placeholder="John Doe"
-            />
-            {errors.username && (
-              <span className="text-sm text-red-500">
-                Full name is required
-              </span>
-            )}
+    <div className="bg-gray-50 flex items-center justify-center px-4 py-12 min-h-screen">
+      <div className="w-full max-w-md">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          {/* Header */}
+          <div className="mb-5 text-center">
+            <h1 className="text-xl font-bold text-gray-900">
+              Create an Account
+            </h1>
+            <p className="text-gray-600 text-sm">
+              Enter your details to get started
+            </p>
           </div>
 
-          {/* Email */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Invalid email address",
-                },
-              })}
-              className="border-2 rounded-md p-2 border-[#663399] bg-transparent focus:outline-none"
-              placeholder="you@example.com"
-            />
-            {errors.email && (
-              <span className="text-sm text-red-500">
-                {errors.email.message}
-              </span>
-            )}
-          </div>
-
-          {/* Password */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="password">Password</label>
-            <div className="relative border-2 rounded-md border-[#663399]">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: { value: 6, message: "Minimum 6 characters" },
-                })}
-                className="bg-transparent p-2 w-full focus:outline-none"
-                placeholder="••••••••"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-2 top-2"
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-            {errors.password && (
-              <span className="text-sm text-red-500">
-                {errors.password.message}
-              </span>
-            )}
-          </div>
-
-          {/* Confirm Password */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              id="confirmPassword"
-              type={showPassword ? "text" : "password"}
-              {...register("confirmPassword", { required: true })}
-              className="border-2 rounded-md p-2 border-[#663399] bg-transparent focus:outline-none"
-              placeholder="••••••••"
-            />
-            {watch("password") &&
-              watch("password") !== watch("confirmPassword") && (
-                <span className="text-sm text-red-500">
-                  Passwords do not match
-                </span>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Full Name */}
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium mb-1">
+                Full Name
+              </label>
+              <div className="flex items-center gap-2 w-full border border-gray-300 rounded-full p-3 focus-within:ring-2 focus-within:ring-[#663399] focus-within:border-[#663399] transition">
+                <User className="text-gray-500" />
+                <input
+                  id="username"
+                  {...register("username", { required: "Full name is required" })}
+                  placeholder="John Doe"
+                  className="w-full focus:outline-none bg-transparent"
+                />
+              </div>
+              {errors.username && (
+                <p className="text-sm text-red-500 mt-1">{errors.username.message}</p>
               )}
-          </div>
+            </div>
 
-          {/* Address (optional) */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="address">Address (optional)</label>
-            <input
-              id="address"
-              {...register("address")}
-              className="border-2 rounded-md p-2 border-[#663399] bg-transparent focus:outline-none"
-              placeholder="123 Main Street"
-            />
-          </div>
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium mb-1">
+                Email
+              </label>
+              <div className="flex items-center gap-2 w-full border border-gray-300 rounded-full p-3 focus-within:ring-2 focus-within:ring-[#663399] focus-within:border-[#663399] transition">
+                <Mail className="text-gray-500" />
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Invalid email address",
+                    },
+                  })}
+                  className="w-full focus:outline-none bg-transparent"
+                />
+              </div>
+              {errors.email && (
+                <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
+              )}
+            </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full p-2 rounded-md text-white bg-[#663399] hover:bg-[#563289] font-semibold disabled:opacity-50"
-            disabled={signupMutation.isPending}
-          >
-            {signupMutation.isPending ? (
-              <>
-                <Loader2 className="animate-spin mr-2 inline-block w-4 h-4" />
-                Creating account...
-              </>
-            ) : (
-              "Create account"
-            )}
-          </button>
-        </form>
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium mb-1">
+                Password
+              </label>
+              <div className="flex items-center gap-2 w-full border border-gray-300 rounded-full p-3 relative focus-within:ring-2 focus-within:ring-[#663399] focus-within:border-[#663399] transition">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: { value: 6, message: "Minimum 6 characters" },
+                  })}
+                  className="w-full focus:outline-none bg-transparent pr-8"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 text-gray-500"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
+              )}
+            </div>
 
-        {/* Login Link */}
-        <p className="text-center text-sm text-gray-500">
-          Already have an account?{" "}
-          <Link href="/auth/login" className="text-[#663399] hover:underline">
-            Login
-          </Link>
-        </p>
+            {/* Confirm Password */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
+                Confirm Password
+              </label>
+              <div className="flex items-center gap-2 w-full border border-gray-300 rounded-full p-3 focus-within:ring-2 focus-within:ring-[#663399] focus-within:border-[#663399] transition">
+                <input
+                  id="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  {...register("confirmPassword", { required: "Confirm password is required" })}
+                  className="w-full focus:outline-none bg-transparent"
+                />
+              </div>
+              {watch("password") &&
+                watch("password") !== watch("confirmPassword") && (
+                  <p className="text-sm text-red-500 mt-1">Passwords do not match</p>
+                )}
+            </div>
+
+            {/* Address (optional) */}
+            <div>
+              <label htmlFor="address" className="block text-sm font-medium mb-1">
+                Address (optional)
+              </label>
+              <div className="flex items-center gap-2 w-full border border-gray-300 rounded-full p-3 focus-within:ring-2 focus-within:ring-[#663399] focus-within:border-[#663399] transition">
+                <Home className="text-gray-500" />
+                <input
+                  id="address"
+                  {...register("address")}
+                  placeholder="123 Main Street"
+                  className="w-full focus:outline-none bg-transparent"
+                />
+              </div>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="w-full bg-[#663399] text-white py-3 rounded-full my-5 font-medium disabled:opacity-50"
+              disabled={signupMutation.isPending}
+            >
+              {signupMutation.isPending ? (
+                <>
+                  <Loader2 className="animate-spin mr-2 inline-block w-4 h-4" />
+                  Creating account...
+                </>
+              ) : (
+                "Create Account"
+              )}
+            </button>
+
+            {/* Login link */}
+            <p className="text-center text-sm text-gray-600">
+              Already have an account?{" "}
+              <Link href="/auth/login" className="text-[#663399] hover:underline font-medium">
+                Login
+              </Link>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   );

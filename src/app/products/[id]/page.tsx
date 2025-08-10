@@ -20,13 +20,22 @@ export default function ProductPage({
   const { data: product, isLoading, error } = useProduct(id);
   const { data: relatedProducts } = useRelatedProducts(id);
   const [selectedImage, setSelectedImage] = useState("");
+  const [selectedSize, setSelectedSize] = useState<string | undefined>(undefined);
+const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
   const router = useRouter();
   const { addToCart, isMutating } = useCart();
-  const { user } = useAuthStore(); 
+  const { user } = useAuthStore();
 
   useEffect(() => {
     if (product?.images?.[0]?.url) {
       setSelectedImage(product.images[0].url);
+    }
+    // Set first available size and color by default if they exist
+    if (product?.sizes?.[0]) {
+      setSelectedSize(product.sizes[0]);
+    }
+    if (product?.colors?.[0]) {
+      setSelectedColor(product.colors[0]);
     }
   }, [product]);
 
@@ -39,12 +48,31 @@ export default function ProductPage({
     }
 
     try {
-      await addToCart({ productId: product._id, quantity: 1 });
+      await addToCart({
+        productId: product._id,
+        quantity: 1,
+        size: product.type === "physical" ? selectedSize : undefined,
+        color: product.type === "physical" ? selectedColor : undefined,
+      });
     } catch (error) {
       console.log(error);
     }
   };
- 
+
+  // Color mapping to Tailwind CSS classes
+  const colorClasses: Record<string, string> = {
+    Red: "bg-red-500",
+    Blue: "bg-blue-500",
+    Green: "bg-green-500",
+    Black: "bg-black",
+    White: "bg-white border border-gray-200",
+    Yellow: "bg-yellow-400",
+    Brown: "bg-amber-700",
+    Purple: "bg-purple-500",
+    Orange: "bg-orange-500",
+    Pink: "bg-pink-500",
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-12 flex items-center justify-center">
@@ -85,10 +113,7 @@ export default function ProductPage({
             <FadeIn>
               <div className="relative aspect-square overflow-hidden rounded-lg border bg-white">
                 <Image
-                  src={
-                    selectedImage ||
-                    product.images[0]?.url
-                  }
+                  src={selectedImage || product.images[0]?.url}
                   alt={product.title}
                   width={500}
                   height={500}
@@ -145,33 +170,111 @@ export default function ProductPage({
               </div>
             </FadeIn>
 
-            <FadeIn delay={0.15}>
+            {product.type === "physical" &&
+              product.sizes &&
+              product.sizes.length > 0 && (
+                <FadeIn delay={0.15}>
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium text-gray-900">Size</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {product.sizes.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => setSelectedSize(size)}
+                          className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                            selectedSize === size
+                              ? "bg-[#663399] text-white"
+                              : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </FadeIn>
+              )}
+
+            {product.type === "physical" &&
+              product.colors &&
+              product.colors.length > 0 && (
+                <FadeIn delay={0.2}>
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium text-gray-900">Color</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {product.colors.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => setSelectedColor(color)}
+                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                            colorClasses[color] || "bg-gray-200"
+                          } ${
+                            selectedColor === color
+                              ? "ring-2 ring-offset-2 ring-[#663399]"
+                              : "hover:ring-1 hover:ring-gray-300"
+                          }`}
+                          title={color}
+                        >
+                          {selectedColor === color && (
+                            <svg
+                              className="w-5 h-5 text-white mix-blend-difference"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </FadeIn>
+              )}
+            <FadeIn delay={0.25}>
               <div className="text-sm text-gray-500">
                 {product?.stock && product.stock > 0 ? (
-                  <span className="text-green-600">
-                    In stock ({product.stock})
+                  <span className="text-green-600 font-medium">
+                    In stock ({product.stock} available)
                   </span>
                 ) : (
-                  <span className="text-red-600">Out of stock</span>
+                  <span className="text-red-600 font-medium">Out of stock</span>
                 )}
               </div>
             </FadeIn>
 
-            <FadeIn delay={0.2}>
-              <div className="flex gap-3">
+            <FadeIn delay={0.3}>
+              <div className="flex gap-3 pt-2">
                 <button
                   onClick={handleAddToCart}
-                disabled={isMutating || !product || (product.stock ?? 0) < 1}
-                  className="flex items-center gap-2 px-4 py-2 rounded bg-[#663399] hover:bg-[#563289] text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={
+                    isMutating ||
+                    !product ||
+                    (product.stock ?? 0) < 1 ||
+                    (product.type === "physical" &&
+                      product.sizes &&
+                      product.sizes.length > 0 &&
+                      !selectedSize) ||
+                    (product.type === "physical" &&
+                      product.colors &&
+                      product.colors.length > 0 &&
+                      !selectedColor)
+                  }
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[#663399] hover:bg-[#563289] text-white font-medium transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                 >
                   {isMutating ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-5 h-5 animate-spin" />
                       Adding...
                     </>
                   ) : (
                     <>
-                      <ShoppingCart className="w-4 h-4" />
+                      <ShoppingCart className="w-5 h-5" />
                       Add to Cart
                     </>
                   )}
@@ -179,13 +282,13 @@ export default function ProductPage({
               </div>
             </FadeIn>
 
-            <FadeIn delay={0.25}>
-              <div className="flex items-center gap-4 pt-4">
-                <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
+            <FadeIn delay={0.35}>
+              <div className="flex items-center gap-4 pt-2">
+                <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-gray-50 transition">
                   <Heart className="w-4 h-4" />
                   Save
                 </button>
-                <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
+                <button className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-gray-50 transition">
                   <Share2 className="w-4 h-4" />
                   Share
                 </button>
@@ -193,7 +296,7 @@ export default function ProductPage({
                   <a
                     href={product.file.url}
                     download
-                    className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
+                    className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-gray-50 transition"
                   >
                     <Download className="w-4 h-4" />
                     Preview
@@ -204,10 +307,12 @@ export default function ProductPage({
           </div>
         </div>
 
-        <div className="border-t my-12"></div>
+        <div className="border-t border-gray-200 my-12"></div>
 
         <div>
-          <h2 className="text-2xl font-bold mb-6">Related Products</h2>
+          <h2 className="text-2xl font-bold mb-6 tracking-tight">
+            Related Products
+          </h2>
           {relatedProducts && relatedProducts.length > 0 ? (
             <RelatedProducts products={relatedProducts} />
           ) : (

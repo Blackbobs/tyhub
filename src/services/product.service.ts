@@ -17,6 +17,8 @@ export interface Product {
     url: string;
     publicId: string;
   };
+  sizes?: string[]; 
+  colors?: string[];
   createdAt: string;
   updatedAt: string;
 }

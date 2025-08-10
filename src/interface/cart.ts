@@ -11,6 +11,8 @@ export interface ICartItem {
     }[];
   };
     quantity: number;
+    size?: string; 
+    color?: string;
   }
 
   export interface ICart {

@@ -60,7 +60,7 @@ function OrderSuccessContent() {
           </h1>
           <p className="mt-2 text-gray-700">{message}</p>
           <button
-            onClick={() => router.push("/account/orders")}
+            onClick={() => router.push("/account")}
             className="mt-6 bg-[#663399] text-white px-4 py-2 rounded hover:bg-[#563289]"
           >
             View My Orders

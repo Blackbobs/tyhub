@@ -9,22 +9,30 @@ export const getCart = async (): Promise<ICart> => {
 export const addToCart = async ({
   productId,
   quantity,
+  size,
+  color
 }: {
   productId: string;
   quantity: number;
+  size?: string;
+  color?: string;
 }): Promise<ICart> => {
-  const response = await axiosConfig.post("/cart", { productId, quantity });
+  const response = await axiosConfig.post("/cart", { productId, quantity, size, color  });
   return response.data;
 };
 
 export const updateCartItem = async ({
   productId,
   quantity,
+  size,
+  color
 }: {
   productId: string;
   quantity: number;
+  size?: string;
+  color?: string;
 }): Promise<ICart> => {
-  const response = await axiosConfig.put(`/cart/${productId}`, { quantity });
+  const response = await axiosConfig.put(`/cart/${productId}`, { quantity, size, color });
   return response.data;
 };
 
