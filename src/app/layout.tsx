@@ -7,7 +7,7 @@ import Footer from "@/components/footer";
 import ReactQueryProvider from "@/providers/react-query-provider";
 
 export const metadata: Metadata = {
-  title: "TyHub | Premium Products for Your Gym Lifestyle",
+  title: "TyHub | Premium Products for Your premium Lifestyle",
   description:
     "Discover our handpicked selection of premium products, curated just for you. Fast shipping and secure checkout.",
 };
