@@ -1,7 +1,7 @@
 import ProductGrid from "@/components/product-grid"
 import type { Metadata } from "next"
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
-import { getProducts } from '@/services/product.service'
+import { getProducts, productKeys } from '@/services/product.service'
 import { getQueryClient } from "@/utils/get-query-clients"
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export default async function ProductsPage() {
   const queryClient = getQueryClient  ()
   
   await queryClient.prefetchQuery({
-    queryKey: ['products', 'list', ],
+    queryKey: productKeys.list(''),
     queryFn: () => getProducts(),
   })
 

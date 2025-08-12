@@ -1,32 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useProducts } from "@/hooks/use-product";
 import ProductCard from "./product-card";
 import { Loader2, PackageX } from "lucide-react";
-import { getProducts, Product } from "@/services/product.service";
 
 export default function FeaturedProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: products = [], isLoading, isError, error } = useProducts();
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const featuredProducts = await getProducts();
-        setProducts(featuredProducts.slice(0, 4)); 
-      } catch (err) {
-        setError("Failed to load featured products");
-        console.error("Error loading featured products:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProducts();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-[#663399]" />
@@ -34,15 +15,17 @@ export default function FeaturedProducts() {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="flex justify-center items-center py-12 text-red-500">
-        {error}
+        {error instanceof Error
+          ? error.message
+          : "Failed to load featured products"}
       </div>
     );
   }
 
-   if (products.length === 0) {
+  if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-gray-500">
         <PackageX className="w-10 h-10 mb-2" />
@@ -51,9 +34,11 @@ export default function FeaturedProducts() {
     );
   }
 
+  const featuredProducts = products.slice(0, 4);
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {products.map((product, index) => (
+      {featuredProducts.map((product, index) => (
         <ProductCard key={product._id} product={product} index={index} />
       ))}
     </div>
