@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useToast } from '@/hooks/use-toast';
 import { updateUserDetails, changePassword } from '@/services/user.service';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { AxiosError } from 'axios';
+import { useToast } from '@/context/toast-context';
 
 interface User {
   username: string;
@@ -50,6 +50,7 @@ export default function AccountDetails({
       toast({
         title: 'Success',
         description: 'Your details have been updated.',
+        variant: 'success'
       });
       setIsEditing(false);
     },
@@ -57,6 +58,7 @@ export default function AccountDetails({
       toast({
         title: 'Error',
         description: 'Failed to update details.',
+        variant: 'error'
       });
     },
   });
@@ -67,6 +69,7 @@ export default function AccountDetails({
       toast({
         title: 'Success',
         description: 'Your password has been changed.',
+        variant: 'success'
       });
       setIsPasswordEditing(false);
       setPasswordData({
@@ -79,6 +82,7 @@ export default function AccountDetails({
       toast({
         title: 'Error',
         description: error.response?.data?.message || 'Failed to change password.',
+        variant: 'error'
       });
     },
   });
