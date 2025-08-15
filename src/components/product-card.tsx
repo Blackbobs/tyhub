@@ -4,12 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-
 import { Loader2, ShoppingBag } from "lucide-react";
 import { Product } from "@/services/product.service";
 import { useCart } from "@/hooks/useCart";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
+import { useToast } from "@/context/toast-context";
 
 interface ProductCardProps {
   product: Product;
@@ -22,19 +22,35 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const prefersReducedMotion = useReducedMotion();
   const { user } = useAuthStore();
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleAddToCart = async () => {
     if (!user) {
+      toast({
+        title: "Please sign in",
+        description: "You must be logged in to add products to your cart.",
+        variant: "warning",
+      });
       router.push("/auth/login");
       return;
     }
-    
+
     try {
       await addToCart({ productId: product._id, quantity: 1 });
+      toast({
+        title: "Added to cart",
+        description: `${product.title} has been added to your cart.`,
+        variant: "success",
+      });
     } catch {
-      // Error handling is done in the mutation
+      toast({
+        title: "Error",
+        description: "Failed to add product to cart. Please try again.",
+        variant: "error",
+      });
     }
   };
+
   const cardVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: (i: number) => ({

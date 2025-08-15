@@ -1,6 +1,6 @@
 "use client"
 
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/context/toast-context";
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
@@ -17,7 +17,7 @@ export default function ToastContainer() {
   if (!mounted) return null
 
   return (
-    <div className="fixed bottom-0 right-0 p-4 z-50 flex flex-col gap-2 max-w-md w-full">
+    <div className="fixed top-0 left-1/2 -translate-x-1/2 p-4 z-50 flex flex-col gap-2 max-w-md w-full">
       <AnimatePresence>
         {toasts.map((toast) => (
           <motion.div

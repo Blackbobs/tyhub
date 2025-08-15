@@ -44,7 +44,7 @@ export default function ProductGrid() {
             <ProductCard key={product._id} product={product} />
           ))}
         </div>
-      )}
+      )}  
     </div>
   )
 }

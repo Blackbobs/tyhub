@@ -5,11 +5,11 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2, Mail, User, Home } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/auth-store";
 import { useMutation } from "@tanstack/react-query";
 import axiosConfig from "@/utils/axios-config";
 import { AxiosError } from "axios";
+import { useToast } from "@/context/toast-context";
 
 type FormData = {
   username: string;
@@ -44,6 +44,7 @@ export default function SignupPage() {
       toast({
         title: "Passwords don't match",
         description: "Please make sure your passwords match.",
+        variant: 'error'
       });
       return;
     }
@@ -59,6 +60,7 @@ export default function SignupPage() {
       toast({
         title: "Account created successfully",
         description: "You have been signed in.",
+        variant: 'success'
       });
 
       router.push("/");
@@ -76,6 +78,7 @@ export default function SignupPage() {
       toast({
         title: "Signup failed",
         description: errorMessage,
+        variant: 'error'
       });
     }
   };

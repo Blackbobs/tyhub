@@ -10,6 +10,7 @@ import { useProduct, useRelatedProducts } from "@/hooks/use-product";
 import { useCart } from "@/hooks/useCart";
 import Image from "next/image";
 import { useAuthStore } from "@/store/auth-store";
+import { useToast } from "@/context/toast-context";
 
 export default function ProductPage({
   params,
@@ -25,6 +26,7 @@ const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined
   const router = useRouter();
   const { addToCart, isMutating } = useCart();
   const { user } = useAuthStore();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (product?.images?.[0]?.url) {
@@ -54,8 +56,18 @@ const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined
         size: product.type === "physical" ? selectedSize : undefined,
         color: product.type === "physical" ? selectedColor : undefined,
       });
+      toast({
+        title: "Added to cart",
+        description: `${product.title} has been added to your cart.`,
+        variant: "success",
+      }); 
     } catch (error) {
       console.log(error);
+      toast({
+        title: "Error",
+        description: "Something went wrong while adding to cart.",
+        variant: "error",
+      });
     }
   };
 

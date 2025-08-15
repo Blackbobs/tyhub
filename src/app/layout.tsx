@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import ToastContainer from "@/components/toast-container";
 import Footer from "@/components/footer";
 import ReactQueryProvider from "@/providers/react-query-provider";
+import { ToastProvider } from "@/context/toast-context";
 
 export const metadata: Metadata = {
   title: "TyHub | Premium Products for Your premium Lifestyle",
@@ -21,10 +22,12 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex flex-col min-h-screen bg-[#f4f4f4]">
         <ReactQueryProvider>
-          <Header />
-          <main className="flex-grow">{children}</main>
-          <Footer />
-          <ToastContainer />
+          <ToastProvider>
+            <Header />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+            <ToastContainer />
+          </ToastProvider>
         </ReactQueryProvider>
       </body>
     </html>

@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useAuthStore } from "@/store/auth-store";
 import { Mail, Lock } from "lucide-react";
 import Link from "next/link";
+import { useToast } from "@/context/toast-context";
+import { AxiosError } from "axios";
 
 type FormData = {
   email: string;
@@ -15,6 +17,7 @@ type FormData = {
 
 export default function LoginPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
   const { setUser } = useAuthStore();
@@ -23,12 +26,34 @@ export default function LoginPage() {
     try {
       setIsLoading(true);
       const response = await axiosConfig.post('/users/signin', data);
+
       localStorage.setItem('accessToken', response.data.accessToken);
       setUser(response.data.user);
+
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+        variant: "success",
+      });
+
       router.push('/');
-    } catch (error) {
-      setIsLoading(false);
-      console.error("Login failed:", error);
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+
+      let errorMessage = "An error occurred while logging in.";
+
+      if (axiosError?.response?.status === 401) {
+        errorMessage = "Invalid email or password.";
+      } else if (axiosError?.response?.data?.message) {
+        errorMessage = axiosError.response.data.message;
+      }
+
+      toast({
+        title: "Login failed",
+        description: errorMessage,
+        variant: "error",
+      });
+
     } finally {
       setIsLoading(false);
     }
@@ -92,8 +117,6 @@ export default function LoginPage() {
                 <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
               )}
             </div>
-
-        
 
             {/* Submit */}
             <button

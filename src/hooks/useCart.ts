@@ -7,7 +7,7 @@ import {
   clearCart,
   createCheckoutSession
 } from '@/services/cart.service';
-import { useToast } from './use-toast';
+import { useToast } from "@/context/toast-context";
 import { ICart } from '@/interface/cart';
 import { useAuthStore } from '@/store/auth-store';
 
@@ -33,10 +33,7 @@ export const useCart = () => {
     mutationFn: addToCart,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
-      toast({
-        title: 'Added to cart',
-        description: 'Item has been added to your cart.',
-      });
+     
     },
     onError: () => {
       toast({
