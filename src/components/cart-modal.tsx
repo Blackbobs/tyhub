@@ -147,8 +147,9 @@ export default function CartModal() {
     <div>
       {/* Cart Button with Badge */}
       <motion.button
+      type="button"
         onClick={handleCartClick}
-        className="relative p-2 text-gray-700 hover:text-gray-900 transition-colors"
+        className="relative p-2 text-gray-700 hover:text-gray-900 transition-colors touch-manipulation"
         aria-label="Open cart"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
