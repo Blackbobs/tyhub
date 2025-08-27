@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2, Mail, User, Home } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, User } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { useMutation } from "@tanstack/react-query";
 import axiosConfig from "@/utils/axios-config";
@@ -16,7 +16,6 @@ type FormData = {
   email: string;
   password: string;
   confirmPassword: string;
-  address?: string;
 };
 
 export default function SignupPage() {
@@ -44,14 +43,14 @@ export default function SignupPage() {
       toast({
         title: "Passwords don't match",
         description: "Please make sure your passwords match.",
-        variant: 'error'
+        variant: "error",
       });
       return;
     }
 
     try {
-      const { password, email, username, address } = data;
-      const userData = { password, email, username, address };
+      const { password, email, username } = data;
+      const userData = { password, email, username };
       const res = await signupMutation.mutateAsync(userData);
 
       localStorage.setItem("accessToken", res.token);
@@ -60,7 +59,7 @@ export default function SignupPage() {
       toast({
         title: "Account created successfully",
         description: "You have been signed in.",
-        variant: 'success'
+        variant: "success",
       });
 
       router.push("/");
@@ -78,7 +77,7 @@ export default function SignupPage() {
       toast({
         title: "Signup failed",
         description: errorMessage,
-        variant: 'error'
+        variant: "error",
       });
     }
   };
@@ -100,20 +99,27 @@ export default function SignupPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Full Name */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium mb-1">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium mb-1"
+              >
                 Full Name
               </label>
               <div className="flex items-center gap-2 w-full border border-gray-300 rounded-full p-3 focus-within:ring-2 focus-within:ring-[#663399] focus-within:border-[#663399] transition">
                 <User className="text-gray-500" />
                 <input
                   id="username"
-                  {...register("username", { required: "Full name is required" })}
+                  {...register("username", {
+                    required: "Full name is required",
+                  })}
                   placeholder="John Doe"
                   className="w-full focus:outline-none bg-transparent"
                 />
               </div>
               {errors.username && (
-                <p className="text-sm text-red-500 mt-1">{errors.username.message}</p>
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.username.message}
+                </p>
               )}
             </div>
 
@@ -139,13 +145,18 @@ export default function SignupPage() {
                 />
               </div>
               {errors.email && (
-                <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium mb-1"
+              >
                 Password
               </label>
               <div className="flex items-center gap-2 w-full border border-gray-300 rounded-full p-3 relative focus-within:ring-2 focus-within:ring-[#663399] focus-within:border-[#663399] transition">
@@ -168,13 +179,18 @@ export default function SignupPage() {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium mb-1"
+              >
                 Confirm Password
               </label>
               <div className="flex items-center gap-2 w-full border border-gray-300 rounded-full p-3 focus-within:ring-2 focus-within:ring-[#663399] focus-within:border-[#663399] transition">
@@ -182,31 +198,21 @@ export default function SignupPage() {
                   id="confirmPassword"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  {...register("confirmPassword", { required: "Confirm password is required" })}
+                  {...register("confirmPassword", {
+                    required: "Confirm password is required",
+                  })}
                   className="w-full focus:outline-none bg-transparent"
                 />
               </div>
               {watch("password") &&
                 watch("password") !== watch("confirmPassword") && (
-                  <p className="text-sm text-red-500 mt-1">Passwords do not match</p>
+                  <p className="text-sm text-red-500 mt-1">
+                    Passwords do not match
+                  </p>
                 )}
             </div>
 
-            {/* Address (optional) */}
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium mb-1">
-                Address (optional)
-              </label>
-              <div className="flex items-center gap-2 w-full border border-gray-300 rounded-full p-3 focus-within:ring-2 focus-within:ring-[#663399] focus-within:border-[#663399] transition">
-                <Home className="text-gray-500" />
-                <input
-                  id="address"
-                  {...register("address")}
-                  placeholder="123 Main Street"
-                  className="w-full focus:outline-none bg-transparent"
-                />
-              </div>
-            </div>
+         
 
             {/* Submit */}
             <button
@@ -227,7 +233,10 @@ export default function SignupPage() {
             {/* Login link */}
             <p className="text-center text-sm text-gray-600">
               Already have an account?{" "}
-              <Link href="/auth/login" className="text-[#663399] hover:underline font-medium">
+              <Link
+                href="/auth/login"
+                className="text-[#663399] hover:underline font-medium"
+              >
                 Login
               </Link>
             </p>
